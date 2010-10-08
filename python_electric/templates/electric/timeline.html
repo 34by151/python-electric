@@ -1,0 +1,45 @@
+{% extends "base_electric.html" %}
+{% load custom %}
+
+{% block head %}
+	<link rel="stylesheet" href="{{ settings.MEDIA_URL }}css/electric.css" type="text/css" media="screen, projection">
+	<script type='text/javascript' src='http://www.google.com/jsapi'></script>
+	
+	<script type='text/javascript'>
+	
+		google.load('visualization', '1', {'packages':['annotatedtimeline']});
+		google.setOnLoadCallback(drawChart);
+		function drawChart() {
+	      
+			var data = new google.visualization.DataTable();
+			data.addColumn('datetime', 'Date');
+			data.addColumn('number', 'Power');
+			data.addRows([
+			   {% for item in data %}[new Date({{ item.DATE|date:"Y" }}, {{ item.DATE|date:"m"|add:"-1" }}, {{ item.DATE|date:"d" }}, {{ item.DATE|date:"G" }}, {{ item.DATE|date:"i" }}, {{ item.DATE|date:"s" }}), {{ item.POWER }}],{% endfor %}       
+			   {% for item in data2 %}[new Date({{ item.DATE|date:"Y" }}, {{ item.DATE|date:"m"|add:"-1" }}, {{ item.DATE|date:"d" }}, {{ item.DATE|date:"G" }}, {{ item.DATE|date:"i" }}, {{ item.DATE|date:"s" }}), {{ item.POWER }}],{% endfor %}
+			]);   
+			
+	
+			var chart = new google.visualization.AnnotatedTimeLine(document.getElementById('chart'));
+			chart.draw(data, {displayAnnotations: false, allValuesSuffix: "kWh"});
+		}
+	</script>
+
+{% endblock %}
+
+{% block content %}
+			<h1>Electricity use for {{ date|date:'F j Y' }}</h1>
+			<ul>
+				<li><a href="/electric/timeline/{{ date|previousday:"%Y/%m/%d/" }}" class="class">previous</a></li>
+				<li><a href="/electric/timeline/day/" class="class">today</a></li>
+				<li><a href="/electric/timeline/{{ date|nextday:"%Y/%m/%d/" }}" class="class">next</a></p></li>
+			</ul>
+
+			{% if data %}
+				<div id='chart' style='width: 700px; height: 300px;'></div>
+				<p></p>	
+			{% else %}
+				<p>No data available yet.</p>
+			{% endif %}
+{% endblock %}
+

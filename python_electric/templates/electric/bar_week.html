@@ -1,0 +1,146 @@
+{% extends "base_electric.html" %}
+{% load custom %}
+
+{% block bodyclass %}{% endblock %}
+
+{% block content %}
+
+				<h1>Electricity use for week of {{ date|date:'F j Y' }}</h1>
+				
+				<h2>Usage Summary</h2>
+				<div id='chart'>
+					<img id="week_chart_image" src="{{ weekchart }}" height="150">
+				</div>	
+
+				<div id="flip_bar">
+					<table id="flip_table" cellpadding="0">
+						<tbody>
+							<tr>
+								<td class="thin-table-cell">
+									<a href="/electric/bar/{{ date|previousweek:"%Y" }}/week/{{ date|previousweek:"%U" }}">
+										<div class="previous_button"></div>
+									</a>
+								</td>
+								<td style="width: 50%;">
+									<a href="/electric/bar/{{ date|previousweek:"%Y" }}/week/{{ date|previousweek:"%U" }}">
+										<div class="previous_label">Previous week</div>
+									</a>
+								</td>
+								<td style="width: 50%;">
+									{% if not date|iscurrentweek %}
+										<a href="/electric/bar/{{ date|nextweek:"%Y" }}/week/{{ date|nextweek:"%U" }}">
+											<div class="next_label">Next week</div>
+										</a>
+									{% endif %}
+								</td>
+								<td style="" class="thin-table-cell">
+									{% if not date|iscurrentweek %}
+										<a href="/electric/bar/{{ date|nextweek:"%Y" }}/week/{{ date|nextweek:"%U" }}">
+											<div class="next_button"></div>
+										</a>
+									{% endif %}
+								</td>
+								<td style="" class="thin-table-cell" id="flip_right_col">
+									{% if not date|iscurrentweek %}
+										<a href="/electric/bar/week/">
+											<div class="latest_button"></div>
+										</a>
+									{% endif %}
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+					
+				<div id="mini_display_budget" style="">
+					<h2>Budget</h2>
+					<div class="header" id="budget_header_title">Compared to past usage</div>
+					<div id="budget_message_container">
+						<span id="budget_message">
+							{% spaceless %}
+							{% if budgetchart.1 > 0.01 %}
+                        <em>{{ budgetchart.1|percent }}% over</em>
+                     {% else %}
+                        {% if budgetchart.1 < -0.01 %}
+                           <em>{{ budgetchart.1|percent }}% under</em>
+                        {% else %}
+                           <em>about even</em> with 
+                        {% endif %}
+                     {% endif %}
+                     expected usage
+                     {% if date|iscurrentweek %}
+                        so far this week.
+                     {% else %}
+                        for the week of {{ date|date:'F j, Y' }}
+                     {% endif %}
+                     {% endspaceless %}
+						</span>
+						<span class="help_icon" id="budget_help"></span>
+					</div>
+					<div id="budget_chart">
+						<img id="budget_chart_image" src="{{ budgetchart.0|safe }}" height="34">
+					</div>
+					
+				</div>
+				
+				<h2>Scatter</h2>
+				
+				<div id="scatter_chart">
+					<img id="scatter_chart_image" src="{{ scatterchart }}">
+				</div>
+
+				<div id="flip_bar">
+					<table id="flip_table" cellpadding="0">
+						<tbody>
+							<tr>
+								<td class="thin-table-cell">
+									<a href="/electric/bar/{{ date|previousweek:"%Y" }}/week/{{ date|previousweek:"%U" }}">
+										<div class="previous_button"></div>
+									</a>
+								</td>
+								<td style="width: 50%;">
+									<a href="/electric/bar/{{ date|previousweek:"%Y" }}/week/{{ date|previousweek:"%U" }}">
+										<div class="previous_label">Previous week</div>
+									</a>
+								</td>
+								<td style="width: 50%;">
+									{% if not date|iscurrentweek %}
+										<a href="/electric/bar/{{ date|nextweek:"%Y" }}/week/{{ date|nextweek:"%U" }}">
+											<div class="next_label">Next week</div>
+										</a>
+									{% endif %}
+								</td>
+								<td style="" class="thin-table-cell">
+									{% if not date|iscurrentweek %}
+										<a href="/electric/bar/{{ date|nextweek:"%Y" }}/week/{{ date|nextweek:"%U" }}">
+											<div class="next_button"></div>
+										</a>
+									{% endif %}
+								</td>
+								<td style="" class="thin-table-cell" id="flip_right_col">
+									{% if not date|iscurrentweek %}
+										<a href="/electric/bar/week/">
+											<div class="latest_button"></div>
+										</a>
+									{% endif %}
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				
+				
+							
+				<div>
+					<h2>things to do:</h2>
+					<ul>
+						<li><strike>Create budget chart for the week</strike></li>
+						<li>Create weekly bar chart (weekly basis!)</li>
+						<li><strike>Create last/current/next</strike></li>
+						
+					</ul>
+				</div>
+				
+				
+{% endblock %}
+

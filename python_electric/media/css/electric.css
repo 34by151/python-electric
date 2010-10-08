@@ -1,0 +1,243 @@
+
+
+
+#navbar {
+	font-size: 1em; 
+	font-family: Verdana, Arial, sans-serif;
+	padding-top: 1em;
+}
+
+	#navbar a {
+		text-decoration: none;
+		color: #6584a3;
+		padding-right: 1px; /*too much space in focus area*/
+		padding-left: 1px;
+	}
+
+		#navbar a:hover {
+			color: #3A526C;
+	    }
+
+		#navbar a.active {
+			color: #3A526C;
+    	}
+
+	#navbar ul {
+		list-style-type: none;
+		text-align: right;
+	}
+		#navbar ul li {
+			display: inline;
+			cursor: pointer;
+			color: #E6E6E6;
+		}
+		#navbar ul li ul li{
+			display: list-item;
+			cursor: pointer;
+		}
+		
+
+#navbar_left {
+	font-size: 1em; 
+	font-family: Verdana, Arial, sans-serif;
+	padding-top: 2em;
+}
+
+	#navbar_left a {
+		text-decoration: none;
+		color: #6584a3;
+	}
+
+		#navbar_left a:hover {
+			color: #3A526C;
+	    }
+
+		#navbar_left a.active {
+			color: #3A526C;
+    	}
+
+	#navbar_left ul {
+		list-style-type: none;
+	}
+		#navbar_left ul li {
+			cursor: pointer;
+			color: #E6E6E6;
+		}
+		#navbar_left ul li ul li{
+			display: list-item;
+			cursor: pointer;
+		}
+
+
+
+#####html, body,h1, h2, h3, h4, h5, h6, p, img, dl, dt, dd, ol, ul, li, table, caption, tbody, tfoot, thead, tr, th, td, form, fieldset, embed, object, applet {
+	margin:0;
+	padding:0;
+	border:0;
+}
+
+
+.help_icon {
+	opacity:.5;
+	background-image:url("/media/python_electric/css/img/buttons.gif");
+	background-repeat:no-repeat;
+	background-position:-1px -161px;
+	width:13px;
+	height:13px;
+	cursor:pointer;
+	display:inline-block;
+	margin-bottom:-2px;
+}
+
+.help_icon:hover {
+	opacity:1;
+}
+
+
+#flip_bar {
+	margin-left:0px;
+	margin-right:0px;
+}
+
+#flip_bar {
+	margin-left:0px;
+	margin-right:0px;
+}
+
+#flip_right_col {
+	_padding-right:10px;
+}
+
+#flip_bar table {
+	width:100%;
+	height:25px;
+	background-color:#ebeff9;
+	border-spacing:0;
+	padding:0;
+}
+
+
+#flip_bar tr {
+	vertical-align:middle;
+
+}
+
+#flip_bar td {
+	margin:0;
+	padding:0;
+	border:0;
+}
+
+#flip_bar td div {
+	white-space:nowrap;
+	font-size:11px;
+}
+
+#flip_bar {
+	_width:auto;
+}
+
+.previous_button, .next_button, .latest_button {
+	background-image:url("/media/python_electric/css/img/buttons.gif");
+	background-repeat:no-repeat;
+	width:21px;
+	height:19px;
+	cursor:pointer;
+}
+
+.previous_button {
+	background-position:0 0;
+}
+
+.previous_button:hover {
+	background-position:0 -20px;
+}
+
+.mobile .previous_button:hover {
+	background-position:0 -27px;
+}
+
+.previous_button:active {
+	background-position:0 -40px;
+}
+
+
+.next_button {
+	background-position:-22px 0;
+	margin-right:2px;
+}
+
+.next_button:hover {
+	background-position:-22px -20px;
+}
+
+
+.next_button:active {
+	background-position:-22px -40px;
+}
+
+
+.latest_button {
+	background-position:-22px -80px;
+}
+
+
+.latest_button:hover {
+	background-position:-22px -100px;
+}
+
+
+.latest_button:active {
+	background-position:-22px -120px;
+}
+
+
+.previous_label, .next_label {
+	color:#6584a3;
+	max-width:100px;
+	cursor:pointer;
+}
+
+.previous_label {
+	margin-left:3px;
+}
+
+.next_label {
+	width:auto;
+	text-align:right;
+	float:right;
+	margin-right:3px;
+}
+
+.thin-table-cell {
+	width:1%;
+}
+
+.budget_message {
+	margin-bottom:4px;
+	padding-left:10px;
+}
+
+.budget_message em {
+	font-style:normal;
+	font-weight:bold;
+	color:#000;
+}
+
+.message_box {
+	margin:0 8em;
+	border:1px solid #fc2;
+	background:#ffc;
+	padding:3px 8px;
+	margin-bottom:1em;
+}
+
+.message_box .author {
+	font-weight:bold;
+}
+
+.message_box .close_button {
+	float:right;
+	padding:3px;
+	margin-right:-5px;
+}

@@ -1,0 +1,159 @@
+{% extends "base_electric.html" %}
+{% load custom %}
+
+{% block content %}
+	 <h1>Electricity use for {{ date|date:'F j Y' }}</h1>
+	
+
+
+	<h2>Usage Summary</h2>
+	<div id='chart'>
+		<img id="hour_chart_image" src="{{ hourchart }}" height="150">
+	</div>
+	<div id="flip_bar">
+		<table id="flip_table" cellpadding="0">
+			<tbody>
+				<tr>
+					<td class="thin-table-cell">
+						<a href="/electric/bar/{{ date|previousday:"%Y/%m/%d/" }}" class="class">
+							<div class="previous_button"></div>
+						</a>
+					</td>
+					<td style="width: 50%;">
+						<a href="/electric/bar/{{ date|previousday:"%Y/%m/%d/" }}" class="class">
+							<div class="previous_label">Previous day</div>
+						</a>
+					</td>
+					<td style="width: 50%;">
+						{% if not date|istoday %}
+							<a href="/electric/bar/{{ date|nextday:"%Y/%m/%d/" }}" class="class">
+								<div class="next_label">Next day</div>
+							</a>
+						{% endif %}
+					</td>
+					<td style="" class="thin-table-cell">
+						{% if not date|istoday %}
+							<a href="/electric/bar/{{ date|nextday:"%Y/%m/%d/" }}" class="class">
+								<div class="next_button"></div>
+							</a>
+						{% endif %}
+					</td>
+					<td style="" class="thin-table-cell" id="flip_right_col">
+						{% if not date|istoday %}
+							<a href="/electric/bar/day/">
+								<div class="latest_button"></div>
+							</a>
+						{% endif %}
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	
+	<div id="mini_display_budget" style="">
+		<h2>Budget</h2>
+		<div class="header" id="budget_header_title">Compared to past usage</div>
+		<div id="budget_message_container">
+			<span id="budget_message">
+				{% spaceless %}
+				{% if budgetchart.1 > 0.01 %}
+	            <em>{{ budgetchart.1|percent }}% over</em>
+	         {% else %}
+	            {% if budgetchart.1 < -0.01 %}
+	               <em>{{ budgetchart.1|percent }}% under</em>
+	            {% else %}
+	               <em>about even</em> with 
+	            {% endif %}
+	         {% endif %}
+	         expected usage
+	         {% if date|istoday %}
+	            so far today.
+	         {% else %}
+	            for {{ date|date:'l' }}
+	         {% endif %}
+	         {% endspaceless %}
+			</span>
+			<span class="help_icon" id="budget_help"></span>
+		</div>
+		<div id="budget_chart">
+			<img id="budget_chart_image" src="{{ budgetchart.0|safe }}" height="34">
+		</div>
+	</div>
+	
+	<div id="avarage_chart">
+		<h2>Trend</h2>
+		<img id="average_chart_image" src="{{ averagechart }}" height="300">
+	</div>
+	
+	<div id="detail_chart">
+		<h2>Detailed Use</h2>
+		<a href="{{ settings.MEDIA_URL }}charts/{{ date|date:'Ymd' }}.png">img</a>
+		<a href="/electric/timeline/{{ date|date:'Y/m/d' }}">flash</a>
+		<div><a href="{{ settings.MEDIA_URL }}charts/{{ date|date:'Ymd' }}.png"><img src="{{ settings.MEDIA_URL }}charts/{{ date|date:'Ymd' }}-small.png" border="0" /></a></div>
+	</div>
+	
+	<div id="stats" style="">
+		<h2>Stats</h2>
+		<div class="header" id="stats_header_title">Usage Statistics</div>
+		<div id="stats_message_container">
+			<ul class="stats">
+				{% for key, value in statistics.items %}
+					<li>{{ key }}: <strong>{{ value }}</strong></li>
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+	
+	<div id="flip_bar">
+		<table id="flip_table" cellpadding="0">
+			<tbody>
+				<tr>
+					<td class="thin-table-cell">
+						<a href="/electric/bar/{{ date|previousday:"%Y/%m/%d/" }}" class="class">
+							<div class="previous_button"></div>
+						</a>
+					</td>
+					<td style="width: 50%;">
+						<a href="/electric/bar/{{ date|previousday:"%Y/%m/%d/" }}" class="class">
+							<div class="previous_label">Previous day</div>
+						</a>
+					</td>
+					<td style="width: 50%;">
+						{% if not date|istoday %}
+							<a href="/electric/bar/{{ date|nextday:"%Y/%m/%d/" }}" class="class">
+								<div class="next_label">Next day</div>
+							</a>
+						{% endif %}
+					</td>
+					<td style="" class="thin-table-cell">
+						{% if not date|istoday %}
+							<a href="/electric/bar/{{ date|nextday:"%Y/%m/%d/" }}" class="class">
+								<div class="next_button"></div>
+							</a>
+						{% endif %}
+					</td>
+					<td style="" class="thin-table-cell" id="flip_right_col">
+						{% if not date|istoday %}
+							<a href="/electric/bar/day/">
+								<div class="latest_button"></div>
+							</a>
+						{% endif %}
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	
+	<div>
+		<h2>things to do:</h2>
+		<ul>
+			<li>Add a text box to add notes for the day</li>
+			<li>Add ability to add tags, seperated by commas</li>
+			<li><strike>have a running 7 day and 14 day running average</strike></li>
+			<li>create "always-on" running trend line</li>
+			<li>add daily usage to running trend line</li>
+		</ul>
+	</div>
+				
+{% endblock %}
+

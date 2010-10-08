@@ -1,0 +1,2 @@
+#labels Featured
+http://python-electric.googlecode.com/svn/wiki/images/screenshots/electricity_month.png

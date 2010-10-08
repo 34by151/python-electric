@@ -1,0 +1,22 @@
+{% extends "base_electric.html" %}
+
+{% block content %}
+			<h1>Electricity use for {{ date|date:'F Y' }}</h1>
+			<h2>Usage Summary</h2>
+			<div id='chart'>
+				<img id="month_chart_image" src="{{ monthchart }}" height="150">
+			</div>
+			<h2>Monthly History</h2>	
+			<div id='chart'>
+				<img id="year_chart_image" src="{{ yearchart }}" height="150">
+			</div>	
+			
+			<div>
+				<h2>things to do:</h2>
+				<ul>
+					<li>create summary for past months? (March, April, May...)</li>
+					<li></li>
+				</ul>
+			</div>
+{% endblock %}
+

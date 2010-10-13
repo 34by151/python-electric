@@ -10,6 +10,7 @@ $(document).ready(function() {
 	var kwpoints = [];
 	var kvapoints = [];
 	var vpoints = [];
+	var pfpoints = []; 
 	var timepoints = [];
 	var lasttime = "";
 	
@@ -20,6 +21,8 @@ $(document).ready(function() {
 	var vmax = 0.0;
 	var kvamin = 10000000.0;
 	var kvamax = 0.0;
+	var pfmin = 1.0;
+	var pfmax = 0.0;
 	
 	var linecolor = '#155811';
 	var fillcolor = '#b4ecb4';
@@ -44,6 +47,7 @@ $(document).ready(function() {
 				kw = parseFloat(data.power);
 				kva = parseFloat(data.kva);
 				volt = parseFloat(data.voltage);
+                                powerfactor = Math.round(kw / kva * 1000)/1000;
 				
 				// prepare power...
 				kwpoints.push(kw);
@@ -105,7 +109,27 @@ $(document).ready(function() {
 				$('#voltBox').html(volt);
 				$('#voltMin').html(vmin);
 				$('#voltMax').html(vmax);
-				
+
+                                // prepare power factor...
+                                pfpoints.push(powerfactor);
+                                if (pfpoints.length > mpoints_max)
+                                        pfpoints.splice(0,1);
+                                pfmax = Array.max(pfpoints)
+                                pfmin = Array.min(pfpoints)
+                                        $('#pfSparkline').sparkline(pfpoints, {
+                                                width: pfpoints.length*2,
+                                                height: '30px',
+                                                lineColor:linecolor,
+                                                fillColor:fillcolor,
+                                                minSpotColor:mincolor,
+                                                maxSpotColor:maxcolor,
+                                                spotColor: spotcolor,
+                                                defaultPixelsPerValue:1});
+                                $('#pfFirst').html(pfpoints[0]);
+                                $('#pfBox').html(powerfactor);
+                                $('#pfMin').html(pfmin);
+                                $('#pfMax').html(pfmax);
+
 				// prepare time...
 				timepoints.push(time);
 				if (timepoints.length > mpoints_max)

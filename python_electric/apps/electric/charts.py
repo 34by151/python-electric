@@ -349,8 +349,11 @@ def CreateMonthDayChart (data):
     G.margin(0,0,10,10)
     
     G.axes('xyr') 
-##    print "MonthDay Chart range interval: %s" % step
-    G.axes.range(1, bottom,top,step)
+
+    cost = 0.08
+
+    G.axes.range(1, round(bottom*cost,2),round(top*cost,2),round(step*cost,2))
+#    G.axes.range(1, bottom,top,step)
     G.axes.range(2, bottom,top,step)
     
     G.axes.label(0, '|'.join(x_label))
@@ -363,7 +366,7 @@ def CreateMonthDayChart (data):
         
     # electricity in kW label
     G.marker ('@telectricity in kW h', '666666', 0, '1:1', 10)
-    
+    G.marker ('@telectricity in $', '666666', 0, '0:1', 10)
     return str(G)
 
 def CreateYearMonthChart (data):
@@ -470,8 +473,9 @@ def CreateYearMonthChart (data):
     G.grid(0, grid, 1, 0)
     
     # electricity in kW label
-    G.marker ('@telectricity in kW h', '666666', 0, '1:1', 10)
-    
+    G.marker ('@taverage in kW h/day', '666666', 0, '1:1', 10)
+    G.marker ('@ttotal in kW h', '666666', 0, '0:1', 10)
+
     return str(G)
     
     

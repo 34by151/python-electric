@@ -14,13 +14,13 @@ class GenericDBOP:
         self.name = name            #table name
         self.dbc = self.db.cursor() #cursor object
         
-    def deleteall():
+    def deleteall(self):
         pass
         # executes "DELETE FROM `django_electric`.`TED_history_second`"
 ##        q = "DELETE FROM %s" % (self.name)
 ##        self.dbc.execute(q)
 
-    def PurgeOldData():
+    def PurgeOldData(self):
         # checks to see if a setting.dayspurge value > 0, and cleans
         # database for entries older than x days
         pass

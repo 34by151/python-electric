@@ -2,18 +2,19 @@
 
 {% block bodyclass %}{% endblock %}
 
-{% block head %}
-	<link rel="stylesheet" href="{{ settings.MEDIA_URL }}css/electric.css" type="text/css" media="screen, projection">
+{% block left_sidebar %}
+	<div id="navbar_left" class="span-6 last">
+		<ul>
+			<li><a href="/electric/bar/day/">day</a></li>
+			<li><a href="/electric/bar/week/">week</a></li>
+			<li><a href="/electric/bar/month/">month</a></li>
+			<li><a href="/electric/livedata/">live data</a></li>
+			<li><a href="/electric/bills/">bills</a></li>
+		</ul>
+	</div>
 {% endblock %}
 
-{% block left_sidebar %}
-	<ul>
-		<li><a href="/electric/bar/day/">day</a></li>
-		<li><a href="/electric/bar/week/">week</a></li>
-		<li><a href="/electric/bar/month/">month</a></li>
-		<li><a href="/electric/livedata/">live data</a></li>
-		<li><a href="/electric/bills/">bills</a></li>
-	</ul>
+{% block left_content %}
 {% endblock %}
 
 

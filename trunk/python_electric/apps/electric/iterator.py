@@ -1,10 +1,9 @@
+#!/usr/bin/env python
 from data_processor import Data_Processor
 from data_import import UpdateTEDDB
 import datetime
 import settings
 import logging, logging.config
-from dbop import RunningAveragesDBOP
-import MySQLdb
 import os, time
 
 logging.config.fileConfig(settings.LOG.CONFIGFILE)
@@ -28,17 +27,22 @@ log.info('---- Updating Running Average database' )
 processor.UpdateRunningAverage()
 
 # update yesterdays second chart if after midnight
-file = settings.CHART.PATH + yesterday.strftime('%Y%m%d.png')
+file = os.path.join(settings.CHART.PATH, yesterday.strftime('%Y%m%d.png'))
 
-#                                       Sat Sep 11 13:45:32 2010
-modified = datetime.datetime.strptime(time.ctime(os.path.getmtime(file)), '%a %b %d %H:%M:%S %Y')
+update = True
+modified = None
+if os.path.exists(file):
+    #                                                                         Sat Sep 11 13:45:32 2010
+    modified = datetime.datetime.strptime(time.ctime(os.path.getmtime(file)), '%a %b %d %H:%M:%S %Y')
+    print modified, midnight + datetime.timedelta(minutes=10)
+    print modified < (midnight + datetime.timedelta(minutes=10))
+    if modified > (midnight + datetime.timedelta(minutes=10)):
+        print '>>False'
+        update = False
 
-if modified < (midnight-datetime.timedelta(minutes=10)):
+if update:
     log.info("---- Updating yesterday's second chart. %s (file date = %s)", file, modified)
     processor.CreateSecondChart(now-datetime.timedelta(days=1))
 else:
-    log.info("---- Yesterday's second chart already up to date. %s (file date = %s)", file, modified  )
-
-
-
+    log.info("---- Yesterday's second chart already up to date. %s (file date = %s)", file, modified)
     

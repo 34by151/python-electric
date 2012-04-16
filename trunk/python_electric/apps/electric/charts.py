@@ -1,11 +1,10 @@
 import datetime, string
 from GChartWrapper import *
-from settings import CHART
+from settings import CHART, ELECTRICITY
 from decimal import *
 
-# 
 import os
-os.environ['HOME'] = "/home/spaceriqui/svn/python_electric/media/charts"
+os.environ['HOME'] = CHART.PATH
 
 # do this before importing pylab or pyplot
 import matplotlib
@@ -14,35 +13,13 @@ import pylab as plt
 from matplotlib.dates import HourLocator, DateFormatter
 
 
-##import logging, logging.config
-##
-##logging.config.fileConfig("logging.conf")
-##log = logging.getLogger("python_electric.charts")
-
-## colors... top b4ecb4 5a9f59 bottom (84c984 extra for weekends), top 70d070, 1d7f17 bottom 
-
-# top opaque light green on historical data
-lightgreenold = 'b4ecb4'
-# bottom opaque dark green on historical data
-darkgreenold = '5a9f59'
-# top bright light green on current data
-lightgreencurrent = '70d070'
-# bottom bright dark green on current data
-darkgreencurrent = '1d7f17' #'229a1c' # was '1d7f17'
-
-current = '155811'#'1d7f17'
-
-plotline = current#'8B0000'
-lightgrey = 'D3D3D3'
-
 chartcolor = '#afafaf'
 textcolor = '#6e6e6e'
 
 width = CHART.WIDTH
 
-def CreateDayHourChart (start, data):
-  
-    now = datetime.datetime.now() + datetime.timedelta(hours=-7)
+def CreateDayHourChart (start, data, cost=ELECTRICITY.RATE):
+    now = datetime.datetime.now()
     x = []
     d = []
     mx = Decimal(CHART.Y_MAX)
@@ -52,8 +29,6 @@ def CreateDayHourChart (start, data):
 
     color = []
 
-##    print "mx: %s (%s)" % (mx, type(mx))
-            
     for item in data:
         power = item['POWER']
         date = item['DATE']
@@ -68,39 +43,36 @@ def CreateDayHourChart (start, data):
                 mx = power
                 
         if date.year == now.year and date.month == now.month and date.day == now.day and date.hour == now.hour:
-            color.append (current)
+            color.append (CHART.COLOR_CURRENT_3)
         else:
-            color.append (lightgreencurrent)
+            color.append (CHART.COLOR_CURRENT_1)
     
     bottom = 0
     top = int(float(mx)+float(0.999999999999))
-    
-##    print "mx: %s (%s)" % (mx, type(mx))
-##    print "bottom: %s top: %s" % (bottom, top)
+    step = 1
     
     scale = y_max/(top-bottom)
     
     for i in range (0, len(x)):
         x[i] = x[i] * scale
         if x[i] > y_max:
-##            print "Error: x[%s]=%s is greater than %s.  Scale of %s is wrong!" % (i, x[i], y_max, scale)
             x[i] = y_max
     
    
     G = VerticalBarStack([x], encoding='extended')
     G.color('|'.join(color))
 
-    G.size(width,150)
-    G.margin(0,0,10,10)
+    G.size(width, 150)
+    G.margin(0, 0, 10, 10)
     
-    G.axes('xyr') 
+    G.axes('xyr')
 
-    cost = 0.08
-
-    G.axes.range(1, round(bottom*cost,2),round(top*cost,2),round(cost,2))
-    G.axes.range(2, bottom,top,1)
+    G.axes.range(1, bottom, top*cost, cost)
+    G.axes.range(2, bottom, top, step)
     
     G.axes.label(0, '|'.join(x_label))
+    y_label_cost = ['%.2f' % (i*cost) for i in range(bottom, top+1, step)]
+    G.axes.label(1, '|'.join(y_label_cost))
     
     # bar thickness and spacing
     G.bar('r', 0.1, 0.1)
@@ -114,10 +86,9 @@ def CreateDayHourChart (start, data):
     return str(G)
 
 
-def CreateWeekDayChart (data):
+def CreateWeekDayChart (data, cost=ELECTRICITY.RATE):
     
-    now = datetime.datetime.now() + datetime.timedelta(hours=-7)
-
+    now = datetime.datetime.now()
     x = []
     d = []
     mx = Decimal(CHART.Y_MAX)
@@ -125,8 +96,6 @@ def CreateWeekDayChart (data):
     x_label = []
     color = []
 
-##    print "WeekDayChart mx: %s (%s)" % (mx, type(mx))
-            
     for item in data:
         power = item['POWER']
         date = item['DATE']
@@ -135,31 +104,27 @@ def CreateWeekDayChart (data):
         x_label.append(date.strftime('%a-')+str(date.day))
         
         if date.year == now.year and date.month == now.month and date.day == now.day:
-            color.append (current)
+            color.append (CHART.COLOR_CURRENT_3)
         elif date.strftime('%U') == now.strftime('%U'):
             if date.strftime('%w') in ['0','6']:
-                color.append (darkgreencurrent)
+                color.append (CHART.COLOR_CURRENT_2)
             else:
-                color.append (lightgreencurrent)
+                color.append (CHART.COLOR_CURRENT_1)
         elif date.strftime('%w') in ['0','6']:
-            color.append (darkgreenold)
+            color.append (CHART.COLOR_HISTORICAL_2)
         else:
-            color.append (lightgreenold)
+            color.append (CHART.COLOR_HISTORICAL_1)
      
         if power == 0:
             pass
         else:
             if power > mx:
                 mx = power
-        
-##    print "WeekDayChart mx: %s (%s)" % (mx, type(mx))
-    
-    #print x
-    #print x_label
-    
+
     bottom = 0
-    
     top = (int(mx/10)+1)*10
+
+
     if (top - bottom) >= 40:
         step = 10
     elif (top - bottom) >= 20:
@@ -169,12 +134,8 @@ def CreateWeekDayChart (data):
     else:
         step = (int(mx/10)+1)*2
 
-    #print "WeekDayChart bottom: %s top: %s step: %s" % (bottom, top, step)
-    
     scale = y_max/(top-bottom)
 
-    
-##    print "WeekDayChart scale: %s" % scale    
     for i in range (0, len(x)):
         x[i] = x[i] * scale
         if x[i] > y_max:
@@ -188,19 +149,17 @@ def CreateWeekDayChart (data):
     G.size(width,150)
     G.margin(0,0,10,10)
     
-    G.axes('xyr') 
+    G.axes('xyr')
 
-    cost = 0.08
-
-    G.axes.range(1, round(bottom*cost,2),round(top*cost,2),round(step*cost,2))
+    G.axes.range(1, bottom,top*cost,step*cost)
     G.axes.range(2, bottom,top,step)
-    
+
     G.axes.label(0, '|'.join(x_label))
-    
+    y_label_cost = ['%.2f' % (i*cost) for i in range(bottom, top+1, step)]
+    G.axes.label(1, '|'.join(y_label_cost))
     # bar thickness and spacing
     G.bar('r', 0.1, 0.1)
     
-##    print "WeekDayChart grid: %s" % (99.9/(top-bottom))
     G.grid(0, 99.9/(top-bottom)*step, 1, 0)
     
     # electricity in kW label
@@ -210,11 +169,9 @@ def CreateWeekDayChart (data):
     return str(G)
 
 def CreateWeekScatterChart (data):
-
-   
-    now = datetime.datetime.now() + datetime.timedelta(hours=-7)
+    now = datetime.datetime.now()
     x = []
-    d = []
+    #d = []
     mx = 0
     x_label = ['','12a','1','2','3','4','5','6','7','8','9','10','11','12p','1','2','3','4','5','6','7','8','9','10','11','']
     y_label = ['','Sun','Mon','Tue','Wed','Thr','Fri','Sat','']
@@ -223,83 +180,60 @@ def CreateWeekScatterChart (data):
     chd_1 = []
     for i in range (0,24):
         chd_1.append(str(i))
-    chd_1 = chd_1 * 8
+    chd_1 *= 8
     chd_2 = []
     for i in range (0,8):
         for k in range (0,24):
             chd_2.append(str(i))
     chd_3 = ['0.0']*24*8 # *8 for an extra row of zeros
 
-##    max_x = 0
-##    max_x = 0
     for item in data:
         power = item['POWER']
         date = item['DATE']
-        
         x.append(float(power))
-        
         if date.year == now.year and date.month == now.month and date.day == now.day:
             if date.hour == now.hour:
-                color.append (current)
+                color.append (CHART.COLOR_CURRENT_3)
             else:
-                color.append (lightgreencurrent)
+                color.append (CHART.COLOR_CURRENT_1)
         else:
-            color.append (lightgreenold)
-     
+            color.append (CHART.COLOR_HISTORICAL_1)
         if power > mx:
             mx = power
         
-    #print "mx: %s (%s)" % (mx, type(mx))
-    #print x
-    #print x_label
-    #print "bottom: %s top: %s" % (bottom, top)
-
-    if mx == 0:
+    if not mx:
          scale = 0
     else:
          scale = float(dotsize/mx)
-    
-    #print dotsize
-    #print scale, type(scale)
 
-    
     for i in range (0, len(x)):
-        #print x[i], type(x[i])
         chd_3[i] = str(int(round(x[i] * scale, 0)))
 
     G = Scatter([chd_1, chd_2, chd_3], encoding='text')
-
-##    G.color('|'.join(color))
 
     G.size(width,width/3)
 
     G.scale (-1,24,-1,7,0,int(dotsize*.75))
     G.axes('xy')
-    G.marker('o',darkgreenold,1,-1,dotsize)
+    G.marker('o',CHART.COLOR_HISTORICAL_2,1,-1,dotsize)
     G.axes.label(0, '|'.join(x_label))
     G.axes.label(1, '|'.join(y_label))
     
-    #G.color('|'.join(color))
-
     # electricity in kW label
     G.marker ('@tmax ' + str(round(mx,1)) + 'kW h', '666666', 0, '1:1', 10,1)
 
     return str(G)    
 
 
-def CreateMonthDayChart (data):
+def CreateMonthDayChart (data, cost=ELECTRICITY.RATE):
     
-    now = datetime.datetime.now() + datetime.timedelta(hours=-7)
-
+    now = datetime.datetime.now()
     x = []
-    d = []
     mx = Decimal(CHART.Y_MAX)
     y_max = 4095
     x_label = []
     color = []
 
-    #print "mx: %s (%s)" % (mx, type(mx))
-            
     for item in data:
         power = item['POWER']
         date = item['DATE']
@@ -308,33 +242,24 @@ def CreateMonthDayChart (data):
         x_label.append(str(date.day))
         
         if date.year == now.year and date.month == now.month and date.day == now.day:
-            color.append (current)
+            color.append (CHART.COLOR_CURRENT_3)
         elif date.strftime('%w') in ['0','6']:
-            color.append (darkgreencurrent)
+            color.append (CHART.COLOR_CURRENT_2)
         else:
-            color.append (lightgreencurrent)
+            color.append (CHART.COLOR_CURRENT_1)
      
-        if power == 0:
+        if not power:
             pass
         else:
             if power > mx:
                 mx = power
         
-    #print "mx: %s (%s)" % (mx, type(mx))
-    
-    #print x
-    #print x_label
-    
     bottom = 0
-#    top = int(float(mx)+float(0.99))
     top = (int(mx/10)+1)*10
     step = (int(mx/10)+1)*2
     
-##    print "MonthDay Chart bottom: %s top: %s" % (bottom, top)
-    
     scale = float(y_max/(top-bottom))
     
-##    print "MonthDay Chart scale: %s" % scale    
     for i in range (0, len(x)):
         x[i] = x[i] * scale
         if x[i] > y_max:
@@ -350,18 +275,17 @@ def CreateMonthDayChart (data):
     
     G.axes('xyr') 
 
-    cost = 0.08
-
-    G.axes.range(1, round(bottom*cost,2),round(top*cost,2),round(step*cost,2))
+    G.axes.range(1, round(bottom*cost,2), round(top*cost,2), step*cost)
 #    G.axes.range(1, bottom,top,step)
-    G.axes.range(2, bottom,top,step)
+    G.axes.range(2, bottom, top, step)
     
     G.axes.label(0, '|'.join(x_label))
+    y_label_cost = ['%.2f' % (i*cost) for i in range(bottom, top+1, step)]
+    G.axes.label(1, '|'.join(y_label_cost))
     
     # bar thickness and spacing
     G.bar('r', 0.1, 0.1)
     
-    #print "grid: %s" % (100.0/(top-bottom))
     G.grid(0, 99.9/(top-bottom)*step, 1, 0)
         
     # electricity in kW label
@@ -370,7 +294,7 @@ def CreateMonthDayChart (data):
     return str(G)
 
 def CreateYearMonthChart (data):
-    now = datetime.datetime.now() + datetime.timedelta(hours=-7)
+    now = datetime.datetime.now()
     
     x = []
     x2 = []
@@ -381,6 +305,7 @@ def CreateYearMonthChart (data):
     
     y_max = 4095.0
     x_label = []
+    x2_label = []
     color = []
 
     #print "mx_1: %s (%s)" % (mx_1, type(mx_1))
@@ -393,11 +318,15 @@ def CreateYearMonthChart (data):
         x.append(float(power))
         x2.append(float(average))
         x_label.append(date.strftime('%b'))
+        if date.strftime('%Y') in x2_label:
+            x2_label.append('')
+        else:
+            x2_label.append(date.strftime('%Y'))
         
         if date.year == now.year and date.month == now.month:
-            color.append (current)
+            color.append (CHART.COLOR_CURRENT_3)
         else:
-            color.append (lightgreenold)
+            color.append (CHART.COLOR_HISTORICAL_1)
      
         if power == 0:
             pass
@@ -418,25 +347,13 @@ def CreateYearMonthChart (data):
     scale_1 = y_max/(top_1-bottom_1)
     step_1 = (int((top_1-bottom_1)/10))*2
     
-##    print "YearMonth bottom_1: %s" % bottom_1
-##    print "YearMonth top_1: %s" % top_1
-##    print "YearMonth scale_1: %s" % scale_1
-##    print "YearMonth step_1: %s" % step_1
-    
-
     bottom_2 = (int(mn_2/10))*10
     top_2 = (int(mx_2/10)+1)*10
     scale_2 = y_max/(top_2-bottom_2)
     step_2 = (int((top_2-bottom_2)/10))*2
 
-##    print "YearMonth bottom_2: %s" % bottom_2
-##    print "YearMonth top_2: %s" % top_2
-##    print "YearMonth scale_2: %s" % scale_2
-##    print "YearMonth step_2: %s" % step_2
-
     grid=100.0/(top_1-bottom_1)*step_1
-##    print "YearMonth grid: %s" % grid
-    
+
     # used to only display the averages for which it is > 0
     x2_end = len(x2)
     x2_start = x2_end
@@ -459,13 +376,14 @@ def CreateYearMonthChart (data):
     G.size(width,150)
     G.margin(0,0,10,10)
     
-    G.axes('xyr') 
+    G.axes('xyrx') 
 
     G.axes.range(1, bottom_1,top_1,step_1)
     G.axes.range(2, bottom_2,top_2,step_2)
 ##    G.axes.range(1, bottom_1,top_1,(top_1-bottom_1)/4)
 ##    G.axes.range(2, bottom_2,top_2,(top_2-bottom_2)/4)
     G.axes.label(0, '|'.join(x_label))
+    G.axes.label(3, '|'.join(x2_label))
     
     # bar thickness and spacing
     G.bar('r', 0.1, 0.1)
@@ -481,8 +399,7 @@ def CreateYearMonthChart (data):
     
 def CreateDayBudgetChart (date, current, budget):
     
-    now = datetime.datetime.now() + datetime.timedelta(hours=-7)
-
+    now = datetime.datetime.now()
 
     if date.year == now.year and date.month == now.month and date.day == now.day:
         time = datetime.time (now.hour, now.minute)
@@ -499,7 +416,6 @@ def CreateDayBudgetChart (date, current, budget):
         
     kw_max = max(current_sum, historical_total)
     
-    historical_sum = 0.0
     if time < datetime.time (6,0):
         historical_sum = budget[0] * (time.hour + time.minute/60.0) / 6 
     elif time < datetime.time (12,0):
@@ -578,28 +494,28 @@ def CreateDayBudgetChart (date, current, budget):
     if c_sq501 > 0.04:
         c_sq501_label = 'night'
     elif c_sq501 > 0.03:
-        c_sq501_label = 'ngt.'
+        c_sq501_label = 'n'
     else:
         c_sq501_label = ''
         
     if c_sq502-c_sq501 > 0.06:
         c_sq502_label = 'morning'
     elif c_sq502-c_sq501 > 0.03:
-        c_sq502_label = 'mor.'
+        c_sq502_label = 'm'
     else:
         c_sq502_label = ''
 
     if c_sq503-c_sq502 > 0.08:
         c_sq503_label = 'afternoon'
     elif c_sq503-c_sq502 > 0.04:
-        c_sq503_label = 'aftn.'
+        c_sq503_label = 'a'
     else:
         c_sq503_label = ''
 
     if c_label-c_sq503 > 0.05:
         c_sq504_label = 'evening'
     elif c_label-c_sq503 > 0.03:
-        c_sq504_label = 'eve.'
+        c_sq504_label = 'e'
     else:
         c_sq504_label = ''
         
@@ -624,15 +540,43 @@ def CreateDayBudgetChart (date, current, budget):
     G.marker (text, '', 0, '0:' + str(c_label), 0)
 
 # HISTORICAL
+    if b_sq501 > 0.04:
+        b_sq501_label = 'night'
+    elif b_sq501 > 0.03:
+        b_sq501_label = 'n'
+    else:
+        b_sq501_label = ''
+
+    if b_sq502-b_sq501 > 0.06:
+        b_sq502_label = 'morning'
+    elif c_sq502-c_sq501 > 0.03:
+        b_sq502_label = 'm'
+    else:
+        b_sq502_label = ''
+
+    if b_sq503-b_sq502 > 0.08:
+        b_sq503_label = 'afternoon'
+    elif b_sq503-b_sq502 > 0.04:
+        b_sq503_label = 'a'
+    else:
+        b_sq503_label = ''
+
+    if b_label-b_sq503 > 0.05:
+        b_sq504_label = 'evening'
+    elif b_label-b_sq503 > 0.03:
+        b_sq504_label = 'e'
+    else:
+        b_sq504_label = ''
+
     if date.year == now.year and date.month == now.month and date.day == now.day:
         G.marker (r"@ysq'i\=" + str(b_length) + r"'=13'scl'\c0c0c0'c", '', 0, '0.5:0', 0, -1) # controls length of historical light gray area
-    G.marker (r"@ynight'h\=10'f\fff'c\h-0-10'a\<=67''scl'", '', 0, '0.5:' + str(b_night), 0) # adds 'night'
+    G.marker (r"@y%s'h\=10'f\fff'c\h-0-10'a\<=67''scl'" % b_sq501_label, '', 0, '0.5:' + str(b_night), 0) # adds 'night'
     G.marker (r"@ysq50'i\=1'=13'scl'\fff'c", '', 0, '0.5:' + str(b_sq501), 0) # adds night divider
-    G.marker (r"@ymorning'h\=10'f\fff'c\h-0-10'a\<=220''scl'", '', 0, '0.5:' + str(b_morning), 0) # adds 'morning' 
+    G.marker (r"@y%s'h\=10'f\fff'c\h-0-10'a\<=220''scl'" % b_sq502_label, '', 0, '0.5:' + str(b_morning), 0) # adds 'morning'
     G.marker (r"@ysq50'i\=1'=13'scl'\fff'c", '', 0, '0.5:' + str(b_sq502),0) # adds morning divider
-    G.marker (r"@yafternoon'h\=10'f\fff'c\h-0-10'a\<=397''scl'", '', 0, '0.5:' + str(b_afternoon), 0) # adds 'afternoon' 
+    G.marker (r"@y%s'h\=10'f\fff'c\h-0-10'a\<=397''scl'" % b_sq503_label, '', 0, '0.5:' + str(b_afternoon), 0) # adds 'afternoon'
     G.marker (r"@ysq50'i\=1'=13'scl'\fff'c", '', 0, '0.5:' + str(b_sq503), 0) # controls historical afternoon divider
-    G.marker (r"@yevening'h\=10'f\fff'c\h-0-10'a\<=181''scl'", '', 0, '0.5:' + str(b_evening), 0) # adds 'evening'
+    G.marker (r"@y%s'h\=10'f\fff'c\h-0-10'a\<=181''scl'" % b_sq504_label, '', 0, '0.5:' + str(b_evening), 0) # adds 'evening'
     G.marker (r"@yl'h\=18'f\666666'c\l-0-13'a", '', 0, '0.5:' + str(b_label), 0) # adds emphasis marker on historical
     text = r"@y" + str(round(historical_total,1)) + r" kWh expected'h\=10'f\666666'c\-6-10'a"
     G.marker (text, '', 0, '0.5:' + str(b_label), 0)    
@@ -644,7 +588,7 @@ def CreateDayBudgetChart (date, current, budget):
 
 def CreateWeeklyBudgetChart (year, week, current, budget):
      
-    now = datetime.datetime.now() + datetime.timedelta(hours=-7)
+    now = datetime.datetime.now()
 
     year_start = datetime.datetime(year, 1, 1)
     week0 = year_start - datetime.timedelta(days=year_start.isoweekday())
@@ -654,19 +598,15 @@ def CreateWeeklyBudgetChart (year, week, current, budget):
         end = now
     else:
         end = start + datetime.timedelta(weeks=1) - datetime.timedelta(seconds=1)
-        
-    #print "start: %s, end: %s" % (start, end)
-    
+
     current_sum = 0.0
     for i in current:
         current_sum += i
-        #print "current: %s, current(sum):%s" % (i, current_sum)
-    
+
     historical_total = 0.0
     for i in budget:
         historical_total += i
-        #print "budget: %s, historical(total):%s" % (i, historical_total)
-        
+
     kw_max = max(current_sum, historical_total)
 
     diff = end - start
@@ -676,12 +616,10 @@ def CreateWeeklyBudgetChart (year, week, current, budget):
 
     for i in range(0,diff.days):
         historical_sum += budget[i]
-        #print "budget [%s]: %s, historical(sum): %s" %(i, budget[i], historical_sum)
-    
+
     if diff.days < 7:
         historical_sum += budget[diff.days]*diff.seconds/float(60*60*24)
-        #print "fraction: %s, +kW: %s, historical(sum): %s" %(diff.seconds/float(60*60*24), budget[diff.days]*diff.seconds/float(60*60*24), historical_sum)
-    
+
     percentage = (current_sum - historical_sum) / historical_sum
         
 
@@ -710,14 +648,11 @@ def CreateWeeklyBudgetChart (year, week, current, budget):
         c_label = 1.0
     
     b_max =  historical_total/float(kw_max)
-##    print "b_max: %s" % b_max
     b_label = b_max
     #pixel_max = 865
     pixel_max = width - 145
-##    print "b_label: %s (%s)" % (b_label, b_label*pixel_max)
     #b_length = long(pixel_max*b_max)
     b_length = (pixel_max-20) * b_max +20
-##    print "b_length: %s" % b_length
 
     c_sq = [0]*regions
     c_l = [0]*regions
@@ -736,20 +671,7 @@ def CreateWeeklyBudgetChart (year, week, current, budget):
         else:
             c_l[i] = round(c_sq[i]/2, precision)
             b_l[i] = round(b_sq[i]/2, precision)
-        
 
-    ### debug
-##    print "current: %s, budget: %s" % (current, budget)
-##    print "start, end", start, end
-##    print "diff: ", diff.days, diff.seconds
-##    print "current: %s, historical(sum): %s, historical (total): %s, max: %s: " % (current_sum, historical_sum, historical_total, kw_max)
-##    print "percentage: %s" % (percentage)
-##    print "c_max: %s" % (c_max)
-##    for i in range (0, regions):
-##        print c_sq[i], c_l[i], b_sq[i], b_l[i]
-        
-    ### debug
-    
     # Set budget chart paramaters
 
     # cht=bhs
@@ -862,7 +784,7 @@ def CreateWeeklyBudgetChart (year, week, current, budget):
 
     return [G.url, percentage]
 
-def CreateAverageChart (data):
+def CreateAverageChart (data, cost=ELECTRICITY.RATE):
     
     mx = 0
     mn = 1000
@@ -871,8 +793,9 @@ def CreateAverageChart (data):
     #y_max = 100
     
     x_label = []
+    y_label_cost = []
 
-    now = datetime.datetime.now() + datetime.timedelta(hours=-7)
+    now = datetime.datetime.now()
     
     for item in data:
         d, x1, x2, x3, x4 = item
@@ -901,12 +824,10 @@ def CreateAverageChart (data):
     
     bottom = int(mn/10)*10
     top = (int(mx/10)+1)*10
-    
+
     scale = y_max/(top-bottom)
     d_start = d[0]
     d_end = d[count-1]
-    
-##    print d_end
     
     x1=list(x1)
     x2=list(x2)
@@ -943,26 +864,30 @@ def CreateAverageChart (data):
 
 
     G = Line([y1, y4], encoding='extended')
-    G.color(lightgrey, plotline)
+    G.color(CHART.COLOR_7, CHART.COLOR_28)
     G.legend('7 day','28 day')
     G.legend_pos('b')
 
     G.size(width,300)
     G.margin(0,0,10,10)
-    
-    cost = 0.08
-
-    G.axes('xyr') 
-    G.axes.range(1, cost*bottom,cost*top,cost*2)
-    G.axes.range(2, bottom,top,4)
-    
-    G.axes.label(0, '|'.join(x_label))
 
     dayofweek = int(d_start.strftime('%w'))
     x_stepsize = 99.9/(count-1)*7
-    y_stepsize = y_max/scale/2
+    y_label_step = int(round((top-bottom)/10.0, ndigits=0))
+    y_stepsize = 99.9/(top-bottom)*y_label_step
     x_offset = x_stepsize - dayofweek/7.0*x_stepsize
- 
+    
+    G.axes('xyr') 
+    G.axes.range(1, cost*bottom,cost*top,cost*y_label_step)
+    G.axes.range(2, bottom,top,y_label_step)
+
+    for i in range(bottom, top+1, y_label_step):
+        y_label_cost.append('%.2f' % (i*cost))
+
+    G.axes.label(1, '|'.join(y_label_cost))
+    
+    G.axes.label(0, '|'.join(x_label))
+
     G.grid(x_stepsize, y_stepsize, 1, 0, x_offset, 0)
     
     G.marker ('@telectricity in kW h', '666666', 0, '1:1', 10)
@@ -971,8 +896,10 @@ def CreateAverageChart (data):
     return str(G)
 
     
-def CreateDayDetailChart (date,timedata, kwdata):
-    matplotlib.rcParams['figure.figsize'] = '8, 2'
+def CreateDayDetailChart (date, timedata, kwdata):
+
+    inches = width/100.0
+    matplotlib.rcParams['figure.figsize'] = '%s, 2' % inches
     matplotlib.rcParams['font.size'] = 8.5 # 12.0
     matplotlib.rcParams['font.family'] = 'arial' # sans-serif
     matplotlib.rcParams['text.color'] = 'orange'#textcolor # black
@@ -980,7 +907,7 @@ def CreateDayDetailChart (date,timedata, kwdata):
     matplotlib.rcParams['xtick.color'] = textcolor#'red'#chartcolor
     matplotlib.rcParams['ytick.color'] = textcolor#'yellow'#chartcolor
     matplotlib.rcParams['grid.color'] = chartcolor
-    matplotlib.rcParams['lines.color'] = plotline
+    matplotlib.rcParams['lines.color'] = CHART.COLOR_CURRENT_3
     matplotlib.rcParams['lines.linewidth'] = 0.6
 
     #matplotlib.font_manager.FontProperties(family=None, style=None, variant=None, weight=None, stretch=None, size=None, fname=None, _init=None)
@@ -990,7 +917,7 @@ def CreateDayDetailChart (date,timedata, kwdata):
     
     # figure 1 small
     
-    filename = CHART.PATH + date.strftime('%Y%m%d-small.png')
+    filename = os.path.join(CHART.PATH, date.strftime('%Y%m%d-small.png'))
     hoursFmt = DateFormatter('%I')
     fig = plt.figure()
     fig.subplots_adjust(left=0.023)
@@ -1003,7 +930,7 @@ def CreateDayDetailChart (date,timedata, kwdata):
     fig.savefig(filename)
     
     # figure 2 large
-    filename = CHART.PATH + date.strftime('%Y%m%d.png')
+    filename = os.path.join(CHART.PATH, date.strftime('%Y%m%d.png'))
     matplotlib.rcParams['figure.figsize'] = '75, 6'
     matplotlib.rcParams['lines.linewidth'] = 0.5
 
@@ -1024,12 +951,6 @@ def CreateDayDetailChart (date,timedata, kwdata):
 ##    print timedata[:-1]
 ##    now = datetime.datetime.now() + datetime.timedelta(hours=-7)
     fig2.text(0.5, 0.95,'Detailed Energy Usage for %s (last updated %s)'% (date.strftime('%m/%d/%Y'), timedata[-1]) )
-
-
-
-
-
-
     fig2.savefig(filename)
     
     return filename

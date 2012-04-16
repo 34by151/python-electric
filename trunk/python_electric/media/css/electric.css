@@ -58,6 +58,7 @@
 
 	#navbar_left ul {
 		list-style-type: none;
+		text-align: left;
 	}
 		#navbar_left ul li {
 			cursor: pointer;
@@ -67,8 +68,29 @@
 			display: list-item;
 			cursor: pointer;
 		}
+		
+#content_left {
+	font-size: .8em; 
+	font-family: Verdana, Arial, sans-serif;
+	padding-top: 2em;
+}
+	
+	#content_left h2 {
+		font-size: 1em;
+		text-align: left;
+	}
 
-
+	#content_left ul {
+		list-style-type: none;
+		text-align: left;
+	}
+		#content_left ul li {
+			color: #6D6D6D;
+		}
+		#content_left ul li ul li{
+			display: list-item;
+		}
+	
 
 #####html, body,h1, h2, h3, h4, h5, h6, p, img, dl, dt, dd, ol, ul, li, table, caption, tbody, tfoot, thead, tr, th, td, form, fieldset, embed, object, applet {
 	margin:0;
@@ -79,7 +101,7 @@
 
 .help_icon {
 	opacity:.5;
-	background-image:url("/media/python_electric/css/img/buttons.gif");
+	background-image:url("/media/css/img/buttons.gif");
 	background-repeat:no-repeat;
 	background-position:-1px -161px;
 	width:13px;
@@ -138,7 +160,7 @@
 }
 
 .previous_button, .next_button, .latest_button {
-	background-image:url("/media/python_electric/css/img/buttons.gif");
+	background-image:url("/media/css/img/buttons.gif");
 	background-repeat:no-repeat;
 	width:21px;
 	height:19px;
@@ -240,4 +262,11 @@
 	float:right;
 	padding:3px;
 	margin-right:-5px;
+}
+
+.posData {
+    /* color:#1d7f17; */ /* uncomment if you want to highlight positive data */
+}
+.negData {
+    color: #e73131; /* highlight where over budget */
 }

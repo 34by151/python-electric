@@ -3,9 +3,68 @@
 
 {% block bodyclass %}{% endblock %}
 
+{% block left_content %}
+	{% if statistics %}
+		<div id="content_left" class="span-6 last">
+			<div id="stats" style="">
+				<div id="stats_message_container">
+					<ul>
+                        <li><strong>{{ statistics.kwtotal|floatformat:2 }}</strong> kWh used</li>
+                        <li><strong>${{ statistics.kwtotalcost|floatformat:2 }}</strong> or approx. <strong>${{ statistics.kwyearcost|floatformat:2 }}</strong>/year</li>
+                        <li>
+                            <span {% if statistics.kwbudget > 0 %}class="negData"{% else %}class="posData" {% endif %}>
+                                {{ statistics.kwbudget|absolute|floatformat:2 }} kWh
+                                {% if statistics.kwbudget > 0 %}
+                                    over
+                                {% else %}
+                                    under
+                                {% endif %}
+                                budget
+                                (${{ statistics.kwbudgetcost|absolute|floatformat:2 }})
+                            </span>
+                        </li>
+                        <li>
+                            <span {% if statistics.lastweek > 0 %}class="negData"{% else %}class="posData" {% endif %}>
+                                {{ statistics.lastweek|absolute|floatformat:2 }} kWh
+                                {% if statistics.lastweek > 0 %}over{% else %}under{% endif %} last week
+                            </span>
+                        </li>
+                    </ul>
+                    <ul>
+						<li>Est. Cost: $<strong>{{ statistics.kwcost|floatformat:4 }}</strong>/kWh</li>
+                        {% if statistics.lastbill %}
+                            <li>based on bill ending on <strong>{{ statistics.lastbill|date:'n/j/Y' }}</strong></li>
+                        {% endif %}
+                    </ul>
+                    <ul>
+						{% if statistics.budgetdate %}
+							<li>Budget set
+							{% if statistics.budgetdate|istoday %}
+	            				<strong>today</strong>
+	         				{% else %}
+	            				on <strong>{{ statistics.budgetdate|date:'n/j/Y' }}</strong>
+	            			{% endif %}
+		            	    </li>
+	            	    {% endif %}
+						<li>Last update:
+							<strong>
+								{% if statistics.lastupdate|istoday %}
+	            				Today at {{ statistics.lastupdate|date:'P' }}
+	         				{% else %}
+	            				{{ statistics.lastupdate|date:'n/j @ P' }}
+	            			{% endif %}
+	            		</strong>
+	            	</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	{% endif %}
+{% endblock %}
+
 {% block content %}
 
-				<h1>Electricity use for week of {{ date|date:'F j Y' }}</h1>
+				<h1>Week of {{ date|date:'F j Y' }}</h1>
 				
 				<h2>Usage Summary</h2>
 				<div id='chart'>
@@ -128,19 +187,6 @@
 						</tbody>
 					</table>
 				</div>
-				
-				
-							
-				<div>
-					<h2>things to do:</h2>
-					<ul>
-						<li><strike>Create budget chart for the week</strike></li>
-						<li>Create weekly bar chart (weekly basis!)</li>
-						<li><strike>Create last/current/next</strike></li>
-						
-					</ul>
-				</div>
-				
-				
+			
 {% endblock %}
 

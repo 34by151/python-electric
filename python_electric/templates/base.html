@@ -11,14 +11,14 @@
 		<meta name="copyright" content="Copyright &copy {% now "Y" %} project.com">
 		<meta name="author" content="Ricardo Camba" >
 
-		<link rel="stylesheet" href="{{ settings.MEDIA_URL }}css/blueprint/screen.css" type="text/css" media="screen, projection">
-		<link rel="stylesheet" href="{{ settings.MEDIA_URL }}css/blueprint/print.css" type="text/css" media="print">	
-		<!--[if lt IE 8]><link rel="stylesheet" href="{{ settings.MEDIA_URL }}css/blueprint/ie.css" type="text/css" media="screen, projection"><![endif]-->
+		<link rel="stylesheet" href="{{ settings.STATIC_URL }}css/blueprint/screen.css" type="text/css" media="screen, projection">
+		<link rel="stylesheet" href="{{ settings.STATIC_URL }}css/blueprint/print.css" type="text/css" media="print">
+		<!--[if lt IE 8]><link rel="stylesheet" href="{{ settings.STATIC_URL }}css/blueprint/ie.css" type="text/css" media="screen, projection"><![endif]-->
 
-
+		<link rel="stylesheet" href="{{ settings.STATIC_URL }}css/electric.css" type="text/css" media="screen, projection">
 
 		<!-- import jquery and page javascript files -->
-		<script type="text/javascript" src="{{ settings.MEDIA_URL }}js/jquery.js"></script>
+		<script type="text/javascript" src="{{ settings.STATIC_URL }}js/jquery.js"></script>
 				
 		{% block head %}{% endblock %}
 		
@@ -41,13 +41,17 @@
 				</ul>
 			</div>
 			<hr /> 
-			<div id="navbar_left" class="span-3">
-				{% block left_sidebar %}{% endblock %}
-			</div>
 			
-			<div class="span-21 last">
+			<div id="left" class="span-5">
+				{% block left_sidebar %}{% endblock %}
+				{% block left_content %}{% endblock %}
+			</div>
+				
+			<div class="span-19 last">
 				{% block content %}{% endblock %}
 			</div>
+			
+
 			
 			<hr /> 
 			<div>

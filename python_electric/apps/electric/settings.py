@@ -1,17 +1,46 @@
+import os
+
+ELECTRIC_APP_PATH = os.path.dirname(os.path.abspath(__file__))
+PROJECT_PATH = os.sep.join(ELECTRIC_APP_PATH.split(os.sep)[0:-2])
+
 ADMINS = (
     ('username', 'user@gmail.com'),
 )
+
+class ELECTRICITY():
+    # default electricity rate:
+    RATE = 0.08
 
 class CHART():
     BUDGET_DAY = [2.464, 8.061, 7.433, 10.693]
     BUDGET_WEEK = [28.651, 28.651, 28.651, 28.651, 28.651, 28.651, 28.651]
     Y_MAX = 3 # sets the initial maximum view in usage charts (kW h)
-    WIDTH = 800
-    PATH = '/home/spaceriqui/svn/python_electric/media/charts/'
+    WIDTH = 700
+    PATH = os.path.join(PROJECT_PATH, 'media', 'charts')
+
+    # top opaque light green on historical data
+    COLOR_HISTORICAL_1 = 'b4ecb4' 
     
+    # bottom opaque dark green on historical data
+    COLOR_HISTORICAL_2 = '5a9f59'
+    
+    # top bright light green on current data
+    COLOR_CURRENT_1 = '70d070'
+    # bottom bright dark green on current data
+    COLOR_CURRENT_2 = '1d7f17' 
+
+    # dark current 
+    COLOR_CURRENT_3 = '155811'
+
+    # running averages...
+    COLOR_7 = 'D3D3D3'
+    COLOR_14 = 'black'
+    COLOR_21 = 'red'
+    COLOR_28 = COLOR_CURRENT_3
+
 
 class LOG():
-    CONFIGFILE = '/home/spaceriqui/svn/python_electric/apps/electric/logging.conf'
+    CONFIGFILE = os.path.join(ELECTRIC_APP_PATH, 'logging.conf')
 
 class DATABASE():
     # Database connection information

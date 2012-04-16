@@ -190,7 +190,7 @@ if __name__=="__main__":
             _detaildate = arg    
             
   
-    log.debug("Running")
+    log.debug("Running...")
 
     processor = Data_Processor()
     

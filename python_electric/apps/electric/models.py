@@ -86,8 +86,16 @@ class average_day(models.Model):
     POWER28 = models.DecimalField(max_digits=5, decimal_places=3)
 
 class utility_bill(models.Model):
-    DATE_START = models.DateField("Service From") 
-    DATE_END = models.DateField("Service Through") 
+    DATE_START = models.DateField("Service From")
+    DATE_END = models.DateField("Service Through")
     POWER_START = models.DecimalField("Previous Reading", max_digits=8, decimal_places=3)
     POWER_END = models.DecimalField("Current Reading", max_digits=8, decimal_places=3)
     COST = models.DecimalField("Electric Service Charge", max_digits=5, decimal_places=2)
+
+
+class daily_budget(models.Model):
+    date = models.DateField("Effective Date") 
+    night = models.DecimalField("Night", max_digits=5, decimal_places=3)
+    morning = models.DecimalField("Morning", max_digits=5, decimal_places=3)
+    afternoon = models.DecimalField("Afternoon", max_digits=5, decimal_places=3)
+    evening = models.DecimalField("Evening", max_digits=5, decimal_places=3)

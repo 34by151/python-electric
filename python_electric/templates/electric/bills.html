@@ -3,8 +3,12 @@
 
 {% block content %}
 	<h1>Electricity Bills</h1>
-	
+	<h2>Monthly History</h2>	
+	<div id='chart'>
+		<img id="year_chart_image" src="{{ yearchart }}" height="150">
+	</div>
 	<div id="bills" style="">
+
 		<h2>Summary</h2>
 		<div id="bills_message_container">
 		
@@ -19,7 +23,7 @@
 					<td>Cost per kWh</td>
 					<td>Days in Period</td>
 					<td>Avg kWh per day</td>
-					<td>Avg kWh cost this period</td>
+					<td>Avg cost this period</td>
 				</tr>
 				<tr>
 					<td></td>
@@ -37,30 +41,26 @@
 				{% for item in bills %}
 					<tr>
 						<td>{{ item.DATE_START|date:"SHORT_DATE_FORMAT" }}</td>
-						<td>{{ item.DATE_END|date:"SHORT_DATE_FORMAT" }}</td>
+						<td>{{ item.DATE|date:"SHORT_DATE_FORMAT" }}</td>
 						<td>{{ item.POWER_START|floatformat:0 }}</td>
 						<td>{{ item.POWER_END|floatformat:0 }}</td>
-						<td>{{ item.CONSUMPTION|floatformat:0 }}</td>
+						<td>{{ item.POWER|floatformat:0 }}</td>
 						<td>{{ item.COST }}</td>
 						<td>{{ item.COSTWATT|floatformat:4 }}</td>
 						<td>{{ item.DAYS }}</td>
-						<td>{{ item.WATTDAY|floatformat:4 }}</td>
+						<td>{{ item.AVERAGE|floatformat:4 }}</td>
 						<td>{{ item.COSTDAY|floatformat:2 }}</td>
 					</tr>
 				{% endfor %}
 			</table>		
 		</div>
 	</div>
+
 	<div id="Comparison" style="">
 		<h2>Comparison with TED</h2>
+		<p>In development</p>
 	</div>
 
-	<div>
-		<h2>things to do:</h2>
-		<ul>
-			<li>first item</li>
-		</ul>
-	</div>
 				
 {% endblock %}
 

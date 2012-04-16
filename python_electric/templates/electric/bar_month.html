@@ -1,11 +1,101 @@
 {% extends "base_electric.html" %}
+{% load custom %}
+
+{% block left_content %}
+	{% if statistics %}
+		<div id="content_left" class="span-6 last">
+			<div id="stats" style="">
+				<div id="stats_message_container">
+					<ul>
+						<li>Totals:</li>
+							<ul>
+								<li><strong>{{ statistics.kwtotal|floatformat:2 }}</strong> kWh ({% if statistics.kwbudget > 0 %}+{% endif %}{{ statistics.kwbudget|floatformat:2 }})</li>
+								<li>$<strong>{{ statistics.kwtotalcost|floatformat:2 }}</strong> ({% if statistics.kwbudget > 0 %}+{% endif %}{{ statistics.kwbudgetcost|floatformat:2 }})</li>
+								<li>approx. $<strong>{{ statistics.kwyearcost|floatformat:2 }}</strong>/year</li>
+							</ul>
+						<li>Averages:</li>
+						<ul>
+							<li>7 day: <strong>{{ statistics.average7|floatformat:2 }}</strong> kWh/Day</li>
+							<li>14 day: <strong>{{ statistics.average14|floatformat:2 }}</strong> kWh/Day</li>
+							<li>28 day: <strong>{{ statistics.average28|floatformat:2 }}</strong> kWh/Day</li>
+						</ul>
+						<li>Est. Cost: $<strong>{{ statistics.kwcost|floatformat:4 }}</strong>/kWh</li>
+                        {% if statistics.lastbill %}
+                            <li>based on bill ending on <strong>{{ statistics.lastbill|date:'n/j/Y' }}</strong></li>
+                        {% endif %}
+
+
+						{% if statistics.budgetdate %}
+							<li>Budget set
+								{% if statistics.budgetdate|istoday %}
+	            				<strong>today</strong>
+	         				{% else %}
+	            				on <strong>{{ statistics.budgetdate|date:'n/j/Y' }}</strong>
+	            			{% endif %}
+		            	</li>
+	            	{% endif %}
+						<li>Last update:
+							<strong>
+								{% if statistics.lastupdate|istoday %}
+	            				Today at {{ statistics.lastupdate|date:'P' }}
+	         				{% else %}
+	            				{{ statistics.lastupdate|date:'n/j @ P' }}
+	            			{% endif %}
+	            		</strong>
+	            	</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	{% endif %}
+{% endblock %}
 
 {% block content %}
-			<h1>Electricity use for {{ date|date:'F Y' }}</h1>
+			<h1>{{ date|date:'F Y' }}</h1>
 			<h2>Usage Summary</h2>
 			<div id='chart'>
 				<img id="month_chart_image" src="{{ monthchart }}" height="150">
 			</div>
+
+    	    <div id="flip_bar">
+                <table id="flip_table" cellpadding="0">
+                    <tbody>
+                        <tr>
+                            <td class="thin-table-cell">
+                                <a href="/electric/bar/{{ date|previousmonth:"%Y/%m/" }}" class="class">
+                                    <div class="previous_button"></div>
+                                </a>
+                            </td>
+                            <td style="width: 50%;">
+                                <a href="/electric/bar/{{ date|previousmonth:"%Y/%m/" }}" class="class">
+                                    <div class="previous_label">Previous month</div>
+                                </a>
+                            </td>
+                            <td style="width: 50%;">
+                                {% if not date|iscurrentmonth %}
+                                    <a href="/electric/bar/{{ date|nextmonth:"%Y/%m/" }}" class="class">
+                                        <div class="next_label">Next month</div>
+                                    </a>
+                                {% endif %}
+                            </td>
+                            <td style="" class="thin-table-cell">
+                                {% if not date|iscurrentmonth %}
+                                    <a href="/electric/bar/{{ date|nextmonth:"%Y/%m/" }}" class="class">
+                                        <div class="next_button"></div>
+                                    </a>
+                                {% endif %}
+                            </td>
+                            <td style="" class="thin-table-cell" id="flip_right_col">
+                                {% if not date|iscurrentmonth %}
+                                    <a href="/electric/bar/month/">
+                                        <div class="latest_button"></div>
+                                    </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 			<h2>Monthly History</h2>	
 			<div id='chart'>
 				<img id="year_chart_image" src="{{ yearchart }}" height="150">

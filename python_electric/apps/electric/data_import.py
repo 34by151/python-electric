@@ -40,7 +40,6 @@
 """
 
 import settings
-from datetime import datetime, timedelta
 import MySQLdb
 from TED import Gateway
 from dbop import TED_DBOP

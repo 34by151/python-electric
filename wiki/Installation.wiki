@@ -5,8 +5,8 @@
 
 python-electric requires the following software in order to use all features
   * [http://httpd.apache.org/docs/2.0/install.html Apache]
-  * [http://www.python.org/download/releases/2.6.6/ Python 2.6]
-  * [http://docs.djangoproject.com/en/dev/topics/install/ Django]
+  * [http://www.python.org/download/releases/2.7/ Python 2.7]
+  * [http://docs.djangoproject.com/en/dev/topics/install/ Django 1.4]
   * [http://dev.mysql.com/doc/refman/5.1/en/installing.html MySQL]
   * [http://matplotlib.sourceforge.net/users/installing.html matplotlib]
   * [http://code.google.com/p/google-chartwrapper/source/checkout GChartWrapper]

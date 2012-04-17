@@ -18,5 +18,5 @@ urlpatterns = patterns('',
 # https://docs.djangoproject.com/en/dev/howto/static-files/
 if settings.DEBUG:
     urlpatterns += patterns('',
-        (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT}),
+        (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
     )

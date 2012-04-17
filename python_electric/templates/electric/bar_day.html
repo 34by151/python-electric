@@ -185,9 +185,9 @@
 	
 	<div id="detail_chart">
 		<div class="header" id="detail_header_title">Detailed usage</div>
-		<a href="{{ settings.STATIC_URL }}charts/{{ date|date:'Ymd' }}.png">img</a>
+		<a href="{{ settings.MEDIA_URL }}charts/{{ date|date:'Ymd' }}.png">img</a>
 		<a href="/electric/timeline/{{ date|date:'Y/m/d' }}">flash</a>
-		<div><a href="{{ settings.STATIC_URL }}charts/{{ date|date:'Ymd' }}.png"><img src="{{ settings.STATIC_URL }}charts/{{ date|date:'Ymd' }}-small.png" border="0" /></a></div>
+		<div><a href="{{ settings.MEDIA_URL }}charts/{{ date|date:'Ymd' }}.png"><img src="{{ settings.STATIC_URL }}charts/{{ date|date:'Ymd' }}-small.png" border="0" /></a></div>
 	</div>
 	
 	<div id="flip_bar">

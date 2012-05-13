@@ -445,8 +445,6 @@ def CreateDayBudgetChart (date, current, budget):
         color_marker = '909000'
         
     c_max =  1.0/kw_max
-    #pixel_max = 900
-    pixel_max = width - 1000
     c_label = current_sum/historical_total
     if c_label > 1:
         c_label = 1.0
@@ -460,12 +458,10 @@ def CreateDayBudgetChart (date, current, budget):
     c_evening = (c_label-c_sq503)/2  + c_sq503
     
     b_max =  historical_total/kw_max
-    #pixel_max = 883
-    pixel_max = width - 115
     b_label = b_max
     
-    b_length = pixel_max*b_max
-    
+    b_length = width*b_max
+
     b_sq501 = budget[0]/historical_total*b_max
     
     b_night = b_sq501/2
@@ -479,7 +475,6 @@ def CreateDayBudgetChart (date, current, budget):
     G.color(color, '666666')
     
     G.size(width,34)
-    G.margin(20,0,0,0)
     G.bar(13,1,1)
     G.axes('xyr')
     G.axes.label(2, str(round(historical_total,1)) + ' kWh expected', str(round(current_sum,1)) + ' kWh used')
@@ -569,7 +564,8 @@ def CreateDayBudgetChart (date, current, budget):
         b_sq504_label = ''
 
     if date.year == now.year and date.month == now.month and date.day == now.day:
-        G.marker (r"@ysq'i\=" + str(b_length) + r"'=13'scl'\c0c0c0'c", '', 0, '0.5:0', 0, -1) # controls length of historical light gray area
+        text = r"@ysq'i\=" + str(b_length) + r"'=13'scl'\c0c0c0'c"
+        G.marker (text, '', 0, '0.5:0', 0, -1) # controls length of historical light gray area
     G.marker (r"@y%s'h\=10'f\fff'c\h-0-10'a\<=67''scl'" % b_sq501_label, '', 0, '0.5:' + str(b_night), 0) # adds 'night'
     G.marker (r"@ysq50'i\=1'=13'scl'\fff'c", '', 0, '0.5:' + str(b_sq501), 0) # adds night divider
     G.marker (r"@y%s'h\=10'f\fff'c\h-0-10'a\<=220''scl'" % b_sq502_label, '', 0, '0.5:' + str(b_morning), 0) # adds 'morning'
@@ -641,18 +637,13 @@ def CreateWeeklyBudgetChart (year, week, current, budget):
     precision = 3
 
     c_max =  1/float(kw_max)
-    #pixel_max = 900
-    #pixel_max = width - 1000
     c_label = current_sum/historical_total
     if c_label > 1:
         c_label = 1.0
     
     b_max =  historical_total/float(kw_max)
     b_label = b_max
-    #pixel_max = 865
-    pixel_max = width - 145
-    #b_length = long(pixel_max*b_max)
-    b_length = (pixel_max-20) * b_max +20
+    b_length = width*b_max
 
     c_sq = [0]*regions
     c_l = [0]*regions
@@ -676,17 +667,16 @@ def CreateWeeklyBudgetChart (year, week, current, budget):
 
     # cht=bhs
     # chd=e:ySAA,AA1Z
-    G = HorizontalBarStack([ [current_sum/kw_max * 100],[0,historical_sum/kw_max * 100] ], encoding='text') 
-    
+    bar_current = round(current_sum/kw_max * 100, 3)
+    bar_budget = round(historical_sum/kw_max * 100, 3)
+    G = HorizontalBarStack([[bar_current],[0,bar_budget]], encoding='text')
+
     # chs=425x34
     G.size(width,34)
 
     # chco=70d070,666666
     G.color(color, '666666')
     
-    ## chma=10,0
-    G.margin(20,0,0,0)
-
     # chbh=13,1,1
     G.bar(13,1,1)
     
@@ -696,8 +686,8 @@ def CreateWeeklyBudgetChart (year, week, current, budget):
     # chxl=2:
     #     210+kW%C2%B7h+expected
     #     160+kW%C2%B7h+used
-    G.axes.label(2, str(historical_total) + ' kWh expected', str(current_sum) + ' kWh used')
-    
+    G.axes.label(2, 'total kilo Wh expected', '')
+
     # chxs=0,ffffff,0,0,t
     #     1,ffffff,10,1,t
     #     2,ffffff,10,-1,t,ffffff
@@ -723,23 +713,23 @@ def CreateWeeklyBudgetChart (year, week, current, budget):
     
     min_space = 0.03
 
-    G.marker ("@yS\'h\\=10\'f\\fff\'c\\h-0-10\'a", '', 0, '0:' + str(c_l[0]), 0)
+    G.marker ("@yS\'h\\=9\'f\\fff\'c\\h-0-10\'a", '', 0, '0:' + str(c_l[0]), 0)
     if c_sq[1]-c_sq[0] > min_space:
-        G.marker ("@yM\'h\\=10\'f\\fff\'c\\h-0-10\'a", '', 0, '0:' + str(c_l[1]), 0)
+        G.marker ("@yM\'h\\=9\'f\\fff\'c\\h-0-10\'a", '', 0, '0:' + str(c_l[1]), 0)
     if c_sq[2]-c_sq[1] > min_space:
-        G.marker ("@yT\'h\\=10\'f\\fff\'c\\h-0-10\'a", '', 0, '0:' + str(c_l[2]), 0)
+        G.marker ("@yT\'h\\=9\'f\\fff\'c\\h-0-10\'a", '', 0, '0:' + str(c_l[2]), 0)
     if c_sq[3]-c_sq[2] > min_space:
-        G.marker ("@yW\'h\\=10\'f\\fff\'c\\h-0-10\'a", '', 0, '0:' + str(c_l[3]), 0)
+        G.marker ("@yW\'h\\=9\'f\\fff\'c\\h-0-10\'a", '', 0, '0:' + str(c_l[3]), 0)
     if c_sq[4]-c_sq[3] > min_space:
-        G.marker ("@yT\'h\\=10\'f\\fff\'c\\h-0-10\'a", '', 0, '0:' + str(c_l[4]), 0)
+        G.marker ("@yT\'h\\=9\'f\\fff\'c\\h-0-10\'a", '', 0, '0:' + str(c_l[4]), 0)
     if c_sq[5]-c_sq[4] > min_space:
-        G.marker ("@yF\'h\\=10\'f\\fff\'c\\h-0-10\'a", '', 0, '0:' + str(c_l[5]), 0)
+        G.marker ("@yF\'h\\=9\'f\\fff\'c\\h-0-10\'a", '', 0, '0:' + str(c_l[5]), 0)
     if c_sq[6]-c_sq[5] > min_space:
-        G.marker ("@yS\'h\\=10\'f\\fff\'c\\h-0-10\'a", '', 0, '0:' + str(c_l[6]), 0)
+        G.marker ("@yS\'h\\=9\'f\\fff\'c\\h-0-10\'a", '', 0, '0:' + str(c_l[6]), 0)
 
     #    @yl'h\=18'f\a06000'c\l-0-13'a,,0,0:0.152,0
-    G.marker ("@yl\'h\\=18\'f\\" + color_marker + "\'c\\l-0-13\'a", '', 0, '0:' + str(round(c_label,precision)), 0) # adds emphasis marker   
-    
+    G.marker ("@yl\'h\\=18\'f\\" + color_marker + "\'c\\l-0-13\'a", '', 0, '0:' + str(round(c_label,precision)), 0) # adds emphasis marker
+
     # bar label for kwh used
     #     @y160+kW%C2%B7h+used'h\=10'f\008000'c\-6-10'a,,0,0:0.786,0
     text = "@y" + str(round(current_sum,1)) + " kWh used\'h\\=10\'f\\" + color_marker + "\'c\\-6-10\'a"
@@ -750,28 +740,28 @@ def CreateWeeklyBudgetChart (year, week, current, budget):
         if i < int(end.strftime('%w')):
             # Current...
             #     @ysq75'i\=1'=13'scl'\fff'c,,0,0:0.192,0
-            G.marker ("@ysq75\'i\\=1\'=13\'scl\'\\fff\'c", '', 0, '0:' + str(c_sq[i]), 0)    
-        
+            G.marker ("@ysq75\'i\\=1\'=13\'scl\'\\fff\'c", '', 0, '0:' + str(c_sq[i]), 0)
+
         # Budget...
         #     @ysq50'i\=1'=13'scl'\fff'c,,0,0.5:0.177,0
-        G.marker ("@ysq50\'i\\=1\'=13\'scl\'\\fff\'c", '', 0, '0.5:' + str(b_sq[i]), 0)    
+        G.marker ("@ysq50\'i\\=1\'=13\'scl\'\\fff\'c", '', 0, '0.5:' + str(b_sq[i]), 0)
 
 
     
     # Budget... Days of the week
     #     @yS'h\=10'f\fff'c\h-0-10'a,,0,0.5:0.089,0
-    G.marker ("@yS\'h\\=10\'f\\fff\'c\\h-0-10\'a", '', 0, '0.5:' + str(b_l[0]), 0)
-    G.marker ("@yM\'h\\=10\'f\\fff\'c\\h-0-10\'a", '', 0, '0.5:' + str(b_l[1]), 0)
-    G.marker ("@yT\'h\\=10\'f\\fff\'c\\h-0-10\'a", '', 0, '0.5:' + str(b_l[2]), 0)
-    G.marker ("@yW\'h\\=10\'f\\fff\'c\\h-0-10\'a", '', 0, '0.5:' + str(b_l[3]), 0)
-    G.marker ("@yT\'h\\=10\'f\\fff\'c\\h-0-10\'a", '', 0, '0.5:' + str(b_l[4]), 0)
-    G.marker ("@yF\'h\\=10\'f\\fff\'c\\h-0-10\'a", '', 0, '0.5:' + str(b_l[5]), 0)
-    G.marker ("@yS\'h\\=10\'f\\fff\'c\\h-0-10\'a", '', 0, '0.5:' + str(b_l[6]), 0)
+    G.marker ("@yS\'h\\=9\'f\\fff\'c\\h-0-10\'a", '', 0, '0.5:' + str(b_l[0]), 0)
+    G.marker ("@yM\'h\\=9\'f\\fff\'c\\h-0-10\'a", '', 0, '0.5:' + str(b_l[1]), 0)
+    G.marker ("@yT\'h\\=9\'f\\fff\'c\\h-0-10\'a", '', 0, '0.5:' + str(b_l[2]), 0)
+    G.marker ("@yW\'h\\=9\'f\\fff\'c\\h-0-10\'a", '', 0, '0.5:' + str(b_l[3]), 0)
+    G.marker ("@yT\'h\\=9\'f\\fff\'c\\h-0-10\'a", '', 0, '0.5:' + str(b_l[4]), 0)
+    G.marker ("@yF\'h\\=9\'f\\fff\'c\\h-0-10\'a", '', 0, '0.5:' + str(b_l[5]), 0)
+    G.marker ("@yS\'h\\=9\'f\\fff\'c\\h-0-10\'a", '', 0, '0.5:' + str(b_l[6]), 0)
     
     # historical light gray area...
     # chm=@ysq'i\=999'=13'scl'\c0c0c0'c,,0,0.5:0,0,-1
     if year == now.year and week == int(now.strftime('%U')):
-        G.marker (r"@ysq'i\=" + str(b_length) + r"'=13'scl'\c0c0c0'c", '', 0, '0.5:0', 0, -1) # controls length of historical light gray area    
+        G.marker (r"@ysq'i\=" + str(b_length) + r"'=13'scl'\c0c0c0'c", '', 0, '0.5:0', 0, -1) # controls length of historical light gray area
     
     
     #    @yl'h\=18'f\666666'c\l-0-13'a,,0,0.5:1,0
@@ -779,7 +769,7 @@ def CreateWeeklyBudgetChart (year, week, current, budget):
     
     # historical bar label for kwh used
     #     @y210+kW%C2%B7h+expected'h\=10'f\666666'c\-6-10'a,,0,0.5:1,0
-    text = r"@y" + str(round(historical_total,1)) + r" kWh expected'h\=10'f\666666'c\-6-10'a"
+    text = r"@y" + str(int(historical_total)) + r" kWh budget'h\=10'f\666666'c\-6-10'a"
     G.marker (text, '', 0, '0.5:' + str(round(b_label, precision)), 0)
 
     return [G.url, percentage]

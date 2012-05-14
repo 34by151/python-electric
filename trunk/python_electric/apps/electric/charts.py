@@ -460,10 +460,9 @@ def CreateDayBudgetChart (date, current, budget):
     b_max =  historical_total/kw_max
     b_label = b_max
     
-    b_length = width*b_max
+    b_length = (width-100)*b_max # needs to be offset a little
 
     b_sq501 = budget[0]/historical_total*b_max
-    
     b_night = b_sq501/2
     b_sq502 = (budget[0]+budget[1])/historical_total*b_max
     b_morning = (b_sq502-b_sq501)/2 + b_sq501
@@ -643,7 +642,7 @@ def CreateWeeklyBudgetChart (year, week, current, budget):
     
     b_max =  historical_total/float(kw_max)
     b_label = b_max
-    b_length = width*b_max
+    b_length = (width-112)*b_max
 
     c_sq = [0]*regions
     c_l = [0]*regions
@@ -772,7 +771,7 @@ def CreateWeeklyBudgetChart (year, week, current, budget):
     text = r"@y" + str(int(historical_total)) + r" kWh budget'h\=10'f\666666'c\-6-10'a"
     G.marker (text, '', 0, '0.5:' + str(round(b_label, precision)), 0)
 
-    return [G.url, percentage]
+    return G.url, percentage
 
 def CreateAverageChart (data, cost=ELECTRICITY.RATE):
     

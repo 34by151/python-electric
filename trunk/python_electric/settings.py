@@ -4,13 +4,12 @@ PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
 PROJECT_DIR = PROJECT_PATH.split(os.sep)[-1]
 
 DEBUG = False
-
 TEMPLATE_DEBUG = DEBUG
 
 INTERNAL_IPS = '127.0.0.1'
 
 ADMINS = (
-    ('name', 'email@email.com'),
+    # ('name', 'email@email.com'),
 )
 
 MANAGERS = ADMINS
@@ -49,7 +48,7 @@ MEDIA_URL = '/media/'
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = ''
+STATIC_ROOT = os.path.join (PROJECT_PATH, 'media', 'static')
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -59,6 +58,13 @@ STATIC_URL = '/static/'
 # Make sure to use a trailing slash.
 # Examples: "http://foo.com/static/admin/", "/static/admin/".
 ADMIN_MEDIA_PREFIX = '/media/admin/' # will be obsolete with version 1.4
+
+STATICFILES_DIRS = (
+    # Put strings here, like "/home/html/static" or "C:/www/django/static".
+    # Always use forward slashes, even on Windows.
+    # Don't forget to use absolute paths, not relative paths.
+    os.path.join (PROJECT_PATH, 'media', 'assets'),
+    )
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'l%)e7f$#tom$@)p_yd3y(djm$@)p_yd3y(dj'
@@ -74,7 +80,9 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 	'django.contrib.auth.context_processors.auth',
 	'django.core.context_processors.i18n',
 	'django.core.context_processors.debug',
-#	'python_electric.tools.context_processors.menu',
+    'django.core.context_processors.static',
+	'python_electric.tools.context_processors.menu',
+    'python_electric.tools.context_processors.menu_electric',
 	'python_electric.tools.context_processors.settings',
 )
 

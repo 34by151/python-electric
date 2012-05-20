@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+
+{% block bodyclass %}{{flatpage.url|cut:"/"}}{% endblock %}
+
+{% block content %}
+    {% if flatpage %}
+        <h1>{{ flatpage.title }}</h1>
+        <div class="append-1 prepend-1">
+            {{ flatpage.content }}
+        </div>
+    {% else %}
+        <p>Page not yet available.</p>
+    {% endif %}
+{% endblock %}
+
+

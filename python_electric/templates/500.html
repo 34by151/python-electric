@@ -1,11 +1,10 @@
 {% extends "base.html" %}
-{% load customcss %}
-{% load i18n %}
 
 {% block bodyclass %}{% endblock %}
 
 {% block content %}
-			<h2>{% trans "Server Error"%}</h2>
- 	
- 			<p>{% trans "We're sorry, but the server experienced a technical error (500)."%}</p>
+			<h2>Server Error</h2>
+            <div class="row">
+ 			    <p>We're sorry, but the server experienced a technical error (500).</p>
+            </div>
 {% endblock %}

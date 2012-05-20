@@ -76,7 +76,7 @@ def percent(value):
     """
         returns percent % and positive
     """
-    return '%.0f' % abs(round(value * 100))
+    return '%.1f' % abs(value * 100)
 
 @register.filter
 def istoday(value):
@@ -110,4 +110,9 @@ def iscurrentmonth(value):
 @register.filter
 def absolute(value):
     'returns the abs() value'
-    return abs(value)
+    try:
+        abs(value)
+    except:
+        return ''
+    else:
+        return abs(value)

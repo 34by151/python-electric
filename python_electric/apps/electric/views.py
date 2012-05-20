@@ -86,6 +86,9 @@ def bar_day(request, year, month, day):
     # the end of the requested date
     end = start.replace(hour = 23, minute = 59)
 
+    # the start date of the requested date minus 1
+    yesterday_start = start-datetime.timedelta(days=1)
+
     ###### DAILY HISTOGRAM ######
     
     # initialize objects
@@ -104,6 +107,7 @@ def bar_day(request, year, month, day):
         
         hour_start = start.replace (hour=now.hour)
         hour_end = hour_start + datetime.timedelta(hours=1)
+        yesterday_end = now - datetime.timedelta(hours=23)
         
         # Django Development command...
         # hour_sum = TED_history_minute.objects.raw('SELECT sum(POWER) FROM TED_history_minute WHERE DATE >= %s', [hour_start])
@@ -133,6 +137,8 @@ def bar_day(request, year, month, day):
             # add last hour to data object...
             if hour_sum:
                 data[hour_start.hour] = {'POWER' : hour_sum/60, 'DATE' : hour_start}
+    else:
+        yesterday_end =  end - datetime.timedelta(days=1)
     
     # get hour history for the requested day...
     history = TED_history_hour.objects.filter(DATE__gte=start)
@@ -205,6 +211,8 @@ def bar_day(request, year, month, day):
     
     # Django 1.1 command...
     cursor = connection.cursor()
+
+    print yesterday_start, yesterday_end
     
     items = [   ['average7', 'SELECT POWER7 FROM electric_average_day WHERE DATE = %s', [start-datetime.timedelta(days=1)]],
                 ['average14', 'SELECT POWER14 FROM electric_average_day WHERE DATE = %s', [start-datetime.timedelta(days=1)]],
@@ -213,6 +221,8 @@ def bar_day(request, year, month, day):
                 ['average14_prime', 'SELECT POWER14 FROM electric_average_day WHERE DATE = %s', [start-datetime.timedelta(days=2)]],
                 ['average28_prime', 'SELECT POWER28 FROM electric_average_day WHERE DATE = %s', [start-datetime.timedelta(days=2)]],
                 ['lastupdate', 'select MAX(date) from TED_history_minute where MTU = %s', [0]],
+                ['lastday', r'select SUM(POWER) FROM TED_history_hour WHERE MTU = %s and (DATE >= %s and DATE < %s)',
+                    [0, yesterday_start, yesterday_end]],
 #                ['<td>Max</td><td><strong>%s</strong> kW @ (time)</td>', 'SELECT max(POWER) FROM TED_history_second WHERE DATE >= %s AND DATE < %s', [start, end]], 
 #                ['<td>Min</td><td><strong>%s</strong> kW @ (time)</td>', 'SELECT min(POWER) FROM TED_history_second WHERE DATE >= %s AND DATE < %s', [start, end]],
                 ]
@@ -228,10 +238,19 @@ def bar_day(request, year, month, day):
                     statistics[key] = x[0]
     
     statistics['kwtotal'] = kwtotal
-    statistics['kwtotalcost'] = kwtotal*cost
-    statistics['kwyearcost'] = kwtotal*cost*Decimal('365.242199')
-    statistics['kwbudget'] = kwtotal * Decimal(str(budgetpercent)) #kwtotal-Decimal(str(sum(budget)))
-    statistics['kwbudgetcost'] = (kwtotal-Decimal(str(sum(budget))))*cost
+    statistics['kwtotalcost'] = kwtotal * cost
+    statistics['kwyearcost'] = kwtotal * cost * Decimal('365.242199')
+
+    statistics['kwbudget'] = kwtotal / (Decimal(str(budgetpercent)) + 1)
+    statistics['kwbudgetcost'] = statistics['kwbudget']*cost
+    statistics['kwbudgetcostyear'] = statistics['kwbudgetcost'] * Decimal('365.242199')
+    statistics['budgetpercent'] = budgetpercent
+
+    statistics['lastday'] = statistics['lastday']
+    statistics['lastdaypercent'] = (statistics['kwtotal'] - statistics['lastday'])/statistics['lastday']
+    statistics['lastdaycost'] = statistics['lastday'] * cost
+    statistics['lastdaycostyear'] = statistics['lastdaycost'] * Decimal('365.242199')
+
     statistics['budgetdate'] = budgetdate
     statistics['kwcost'] = cost
     statistics['lastbill'] = lastbill
@@ -325,12 +344,14 @@ def bar_week(request, year, week):
             # add the total for the requested week...
             kwtotal += item.POWER
         else:
+            # add the total for the previous week...
             kwtotal_lastweek += item.POWER
+
 
     current[0:7] = []
     
     weekchart = CreateWeekDayChart (data, cost=cost)
-    budgetchart = CreateWeeklyBudgetChart (year, week, current, budget)
+    budgetchart, budgetpercent = CreateWeeklyBudgetChart (year, week, current, budget)
     
     data = []
     max = 0
@@ -404,13 +425,28 @@ def bar_week(request, year, week):
     statistics['kwtotal'] = kwtotal
     statistics['kwtotalcost'] = kwtotal*cost
     statistics['kwyearcost'] = kwtotal*cost*Decimal('52.177457')
-    statistics['kwbudget'] = kwtotal-Decimal(str(sum(budget)))
-    statistics['kwbudgetcost'] = (kwtotal-Decimal(str(sum(budget))))*cost
+
+    #statistics['kwbudget'] = kwtotal-Decimal(str(sum(budget)))
+    statistics['kwbudget'] = kwtotal / (Decimal(str(budgetpercent)) + 1)
+
+#    statistics['kwbudgetcost'] = (kwtotal-Decimal(str(sum(budget))))*cost
+    statistics['kwbudgetcost'] = statistics['kwbudget']*cost
+    #statistics['kwbudgetcost_delta'] = statistics['kwbudget_delta']*cost
+
+    statistics['kwbudgetcostyear'] = statistics['kwbudgetcost'] * Decimal('52.177457')
+    #statistics['kwbudgetcostyear_delta'] = statistics['kwbudgetcost_delta'] * Decimal('52.177457')
+    #statistics['kwbudgetcost']
+
+    statistics['budgetpercent'] = budgetpercent
     statistics['budgetdate'] = budgetdate
     statistics['kwcost'] = cost
     statistics['lastbill'] = lastbill
-    statistics['lastweek'] = kwtotal - kwtotal_lastweek
-    
+    statistics['lastweek'] = kwtotal_lastweek * statistics['kwbudget'] / Decimal(str(sum(budget)))
+    statistics['lastweekpercent'] = (statistics['kwtotal'] - statistics['lastweek'])/statistics['lastweek']
+    statistics['lastweekcost'] = statistics['lastweek'] * cost
+    statistics['lastweekcostyear'] = statistics['lastweekcost'] * Decimal('52.177457')
+
+
     return render_to_response ('electric/bar_week.html',
             {'weekchart':weekchart,
              'date' : weekrequest,

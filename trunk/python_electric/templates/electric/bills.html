@@ -1,66 +1,57 @@
 {% extends "base_electric.html" %}
 {% load custom %}
 
-{% block content %}
+{% block content_electric %}
 	<h1>Electricity Bills</h1>
 	<h2>Monthly History</h2>	
 	<div id='chart'>
 		<img id="year_chart_image" src="{{ yearchart }}" height="150">
 	</div>
-	<div id="bills" style="">
-
-		<h2>Summary</h2>
-		<div id="bills_message_container">
-		
-			<table>
-				<tr>
-					<td>Service From</td>
-					<td>Service Through</td>
-					<td>Previous Reading</td>
-					<td>Current Reading</td>
-					<td>Total Consumption</td>
-					<td>Service Charge</td>
-					<td>Cost per kWh</td>
-					<td>Days in Period</td>
-					<td>Avg kWh per day</td>
-					<td>Avg cost this period</td>
-				</tr>
-				<tr>
-					<td></td>
-					<td></td>
-					<td></td>
-					<td></td>
-					<td>kWh</td>
-					<td>$</td>
-					<td>$/kWh</td>
-					<td>days</td>
-					<td>kWh/day</td>
-					<td>$/day</td>
-				</tr>
-				
-				{% for item in bills %}
-					<tr>
-						<td>{{ item.DATE_START|date:"SHORT_DATE_FORMAT" }}</td>
-						<td>{{ item.DATE|date:"SHORT_DATE_FORMAT" }}</td>
-						<td>{{ item.POWER_START|floatformat:0 }}</td>
-						<td>{{ item.POWER_END|floatformat:0 }}</td>
-						<td>{{ item.POWER|floatformat:0 }}</td>
-						<td>{{ item.COST }}</td>
-						<td>{{ item.COSTWATT|floatformat:4 }}</td>
-						<td>{{ item.DAYS }}</td>
-						<td>{{ item.AVERAGE|floatformat:4 }}</td>
-						<td>{{ item.COSTDAY|floatformat:2 }}</td>
-					</tr>
-				{% endfor %}
-			</table>		
-		</div>
-	</div>
-
-	<div id="Comparison" style="">
-		<h2>Comparison with TED</h2>
-		<p>In development</p>
-	</div>
-
-				
+    <hr/>
+    <h2>Details</h2>
+    <table class="table table-bordered table-condensed table-striped">
+        <thead>
+        <tr>
+            <th>Service From</th>
+            <th>Service Through</th>
+            <th>Previous Reading</th>
+            <th>Current Reading</th>
+            <th>Total Consumption</th>
+            <th>Service Charge</th>
+            <th>Cost/kWh</th>
+            <th>Days/Period</th>
+            <th>Avg kWh/day</th>
+            <th>Avg cost this period</th>
+        </tr>
+        <tr>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th>kWh</th>
+            <th>$</th>
+            <th>$/kWh</th>
+            <th>days</th>
+            <th>kWh/day</th>
+            <th>$/day</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in bills %}
+            <tr>
+                <td>{{ item.DATE_START|date:"SHORT_DATE_FORMAT" }}</td>
+                <td>{{ item.DATE|date:"SHORT_DATE_FORMAT" }}</td>
+                <td>{{ item.POWER_START|floatformat:0 }}</td>
+                <td>{{ item.POWER_END|floatformat:0 }}</td>
+                <td>{{ item.POWER|floatformat:0 }}</td>
+                <td>{{ item.COST }}</td>
+                <td>{{ item.COSTWATT|floatformat:4 }}</td>
+                <td>{{ item.DAYS }}</td>
+                <td>{{ item.AVERAGE|floatformat:4 }}</td>
+                <td>{{ item.COSTDAY|floatformat:2 }}</td>
+            </tr>
+        </tbody>
+        {% endfor %}
+    </table>
 {% endblock %}
 

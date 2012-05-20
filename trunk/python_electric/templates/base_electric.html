@@ -2,20 +2,25 @@
 
 {% block bodyclass %}{% endblock %}
 
-{% block left_sidebar %}
-	<div id="navbar_left" class="span-6 last">
-		<ul>
-			<li><a href="/electric/bar/day/">day</a></li>
-			<li><a href="/electric/bar/week/">week</a></li>
-			<li><a href="/electric/bar/month/">month</a></li>
-			<li><a href="/electric/livedata/">live data</a></li>
-			<li><a href="/electric/bills/">bills</a></li>
-		</ul>
-	</div>
+{% block content %}
+    <div class="row">
+        <div class="span3">
+            <div class="row">
+                <div class="well">
+                    <ul class="nav nav-list">
+                        <li class="nav-header">Electricity</li>
+                        {% for item in menu_electric %}
+                            <li{% if item.2 %} class="active"{% endif %}>
+                                <a{% if item.1 %} href="{{ item.1 }}"{% endif %}>{{ item.0|safe }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% block left_content %}{% endblock %}
+        </div>
+        <div class="span9">
+            {% block content_electric %}{% endblock %}
+        </div>
+    </div>
 {% endblock %}
-
-{% block left_content %}
-{% endblock %}
-
-
-{% block content %}{% endblock %}

@@ -4,189 +4,144 @@
 {% block bodyclass %}{% endblock %}
 
 {% block left_content %}
-	{% if statistics %}
-		<div id="content_left" class="span-6 last">
-			<div id="stats" style="">
-				<div id="stats_message_container">
-					<ul>
-                        <li><strong>{{ statistics.kwtotal|floatformat:2 }}</strong> kWh used</li>
-                        <li><strong>${{ statistics.kwtotalcost|floatformat:2 }}</strong> or approx. <strong>${{ statistics.kwyearcost|floatformat:2 }}</strong>/year</li>
-                        <li>
-                            <span {% if statistics.kwbudget > 0 %}class="negData"{% else %}class="posData" {% endif %}>
-                                {{ statistics.kwbudget|absolute|floatformat:2 }} kWh
-                                {% if statistics.kwbudget > 0 %}
-                                    over
-                                {% else %}
-                                    under
+    <div class="row">
+        <div class="well">
+            <div class="btn-group">
+                <a href="/electric/bar/{{ date|previousweek:"%Y" }}/week/{{ date|previousweek:"%U" }}">
+                    <button class="btn btn-small"><i class="icon-step-backward">></i></button>
+                </a>
+                {#        </div>#}
+                {#        <div class="span2 pull-right">#}
+                <button class="btn btn-small btn-info disabled">{{ date|date:'DATE_FORMAT' }}</button>
+                {% if not date|iscurrentweek %}<a href="/electric/bar/{{ date|nextweek:"%Y" }}/week/{{ date|nextweek:"%U" }}">{% endif %}
+                <button class="btn btn-small pull-right {% if date|iscurrentweek %}disabled{% endif %}"><i class="icon-step-forward">></i></button>
+                {% if not date|iscurrentweek %}</a>{% endif %}
+                {% if not date|iscurrentweek %}<a href="/electric/bar/week/">{% endif %}
+                <button class="btn btn-small pull-right {% if date|iscurrentweek %}disabled{% endif %}"><i class="icon-fast-forward">></i></button>
+                {% if not date|iscurrentweek %}</a>{% endif %}
+            </div>
+        </div>
+    </div>
+    {% if statistics %}
+        <div class="row">
+            <div class="well">
+                <h4>Statistics</h4>
+                <br>
+                <table class="table table-condensed stat">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>used</th>
+                            <th>budget</th>
+                            <th>last</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>kW·h</th>
+                            <td>{{ statistics.kwtotal|floatformat:1 }}</td>
+                            <td>{{ statistics.kwbudget|absolute|floatformat:1 }}<br>
+                                {{ statistics.budgetpercent|percent }}%
+                                {% if statistics.budgetpercent > 0 %}
+                                    <i class="icon-arrow-up"></i>
+                                {% elif statistics.budgetpercent < 0 %}
+                                    <i class="icon-arrow-down"></i>
                                 {% endif %}
-                                budget
-                                (${{ statistics.kwbudgetcost|absolute|floatformat:2 }})
-                            </span>
-                        </li>
-                        <li>
-                            <span {% if statistics.lastweek > 0 %}class="negData"{% else %}class="posData" {% endif %}>
-                                {{ statistics.lastweek|absolute|floatformat:2 }} kWh
-                                {% if statistics.lastweek > 0 %}over{% else %}under{% endif %} last week
-                            </span>
-                        </li>
-                    </ul>
-                    <ul>
-						<li>Est. Cost: $<strong>{{ statistics.kwcost|floatformat:4 }}</strong>/kWh</li>
+                            </td>
+                            <td>{{ statistics.lastweek|absolute|floatformat:1 }}<br>
+                                {{ statistics.lastweekpercent|percent }}%
+                                {% if statistics.lastweekpercent > 0 %}
+                                    <i class="icon-arrow-up"></i>
+                                {% elif statistics.lastweekpercent < 0 %}
+                                    <i class="icon-arrow-down"></i>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>$</th>
+                            <td>{{ statistics.kwtotalcost|floatformat:2 }}</td>
+                            <td>
+                                {{ statistics.kwbudgetcost|floatformat:2 }}
+                            </td>
+                            <td>{{ statistics.lastweekcost|floatformat:2 }}</td>
+                        </tr>
+                        <tr>
+                            <th>$/year</th>
+                            <td>{{ statistics.kwyearcost|floatformat:0 }}</td>
+                            <td>{{ statistics.kwbudgetcostyear|floatformat:0 }}</td>
+                            <td>{{ statistics.lastweekcostyear|floatformat:0 }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <ul class="unstyled">
+                    <li>
+                        Est. Cost: $<strong>{{ statistics.kwcost|floatformat:4 }}</strong>/kW·h
                         {% if statistics.lastbill %}
-                            <li>based on bill ending on <strong>{{ statistics.lastbill|date:'n/j/Y' }}</strong></li>
+                            based on bill ending on <strong>{{ statistics.lastbill|date:'n/j/Y' }}</strong>
                         {% endif %}
-                    </ul>
-                    <ul>
-						{% if statistics.budgetdate %}
-							<li>Budget set
-							{% if statistics.budgetdate|istoday %}
-	            				<strong>today</strong>
-	         				{% else %}
-	            				on <strong>{{ statistics.budgetdate|date:'n/j/Y' }}</strong>
-	            			{% endif %}
-		            	    </li>
-	            	    {% endif %}
-						<li>Last update:
-							<strong>
-								{% if statistics.lastupdate|istoday %}
-	            				Today at {{ statistics.lastupdate|date:'P' }}
-	         				{% else %}
-	            				{{ statistics.lastupdate|date:'n/j @ P' }}
-	            			{% endif %}
-	            		</strong>
-	            	</li>
-					</ul>
-				</div>
-			</div>
-		</div>
+                    </li>
+                </ul>
+                <ul class="unstyled">
+                    <li>Last update:
+                        <strong>
+                            {% if statistics.lastupdate|istoday %}
+                                Today at {{ statistics.lastupdate|date:'P' }}
+                            {% else %}
+                                {{ statistics.lastupdate|date:'n/j @ P' }}
+                            {% endif %}
+                        </strong>
+                    </li>
+                </ul>
+            </div>
+        </div>
 	{% endif %}
 {% endblock %}
 
-{% block content %}
+{% block content_electric %}
+    <h1>Electricity Use <small>Week of {{ date|date:'DATE_FORMAT' }}</small></h1>
 
-				<h1>Week of {{ date|date:'F j Y' }}</h1>
-				
-				<h2>Usage Summary</h2>
-				<div id='chart'>
-					<img id="week_chart_image" src="{{ weekchart }}" height="150">
-				</div>	
+    <h2>Weekly Summary</h2>
+    <div id='chart'>
+        <img id="week_chart_image" src="{{ weekchart }}" height="150">
+    </div>
+    <hr/>
 
-				<div id="flip_bar">
-					<table id="flip_table" cellpadding="0">
-						<tbody>
-							<tr>
-								<td class="thin-table-cell">
-									<a href="/electric/bar/{{ date|previousweek:"%Y" }}/week/{{ date|previousweek:"%U" }}">
-										<div class="previous_button"></div>
-									</a>
-								</td>
-								<td style="width: 50%;">
-									<a href="/electric/bar/{{ date|previousweek:"%Y" }}/week/{{ date|previousweek:"%U" }}">
-										<div class="previous_label">Previous week</div>
-									</a>
-								</td>
-								<td style="width: 50%;">
-									{% if not date|iscurrentweek %}
-										<a href="/electric/bar/{{ date|nextweek:"%Y" }}/week/{{ date|nextweek:"%U" }}">
-											<div class="next_label">Next week</div>
-										</a>
-									{% endif %}
-								</td>
-								<td style="" class="thin-table-cell">
-									{% if not date|iscurrentweek %}
-										<a href="/electric/bar/{{ date|nextweek:"%Y" }}/week/{{ date|nextweek:"%U" }}">
-											<div class="next_button"></div>
-										</a>
-									{% endif %}
-								</td>
-								<td style="" class="thin-table-cell" id="flip_right_col">
-									{% if not date|iscurrentweek %}
-										<a href="/electric/bar/week/">
-											<div class="latest_button"></div>
-										</a>
-									{% endif %}
-								</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
-					
-				<div id="mini_display_budget" style="">
-					<h2>Budget</h2>
-					<div class="header" id="budget_header_title">Compared to past usage</div>
-					<div id="budget_message_container">
-						<span id="budget_message">
-							{% spaceless %}
-							{% if budgetchart.1 > 0.01 %}
-                        <em>{{ budgetchart.1|percent }}% over</em>
-                     {% else %}
-                        {% if budgetchart.1 < -0.01 %}
-                           <em>{{ budgetchart.1|percent }}% under</em>
-                        {% else %}
-                           <em>about even</em> with 
-                        {% endif %}
-                     {% endif %}
-                     expected usage
-                     {% if date|iscurrentweek %}
-                        so far this week.
-                     {% else %}
-                        for the week of {{ date|date:'F j, Y' }}
-                     {% endif %}
-                     {% endspaceless %}
-						</span>
-						<span class="help_icon" id="budget_help"></span>
-					</div>
-					<div id="budget_chart">
-						<img id="budget_chart_image" src="{{ budgetchart.0|safe }}" height="34">
-					</div>
-					
-				</div>
-				
-				<h2>Scatter</h2>
-				
-				<div id="scatter_chart">
-					<img id="scatter_chart_image" src="{{ scatterchart }}">
-				</div>
+    <h2>Budget
+        <small>
+            {% if statistics.budgetdate %}budget set
+                {% if statistics.budgetdate|istoday %}
+                    today
+                {% else %}
+                    on {{ statistics.budgetdate|date:'DATE_FORMAT' }}
+                {% endif %}
+            {% else %}
+                default budget
+            {% endif %}
+        </small>
+    </h2>
+    <p>
+        {% if statistics.budgetpercent > 0.01 %}
+            <strong>{{ statistics.budgetpercent|percent }}% over</strong>
+        {% elif statistics.budgetpercent < -0.01 %}
+            <strong>{{ statistics.budgetpercent|percent }}% under</strong>
+        {% else %}
+            <strong>about even</strong> with
+        {% endif %}
+        expected usage
+        {% if date|iscurrentweek %}
+            so far this week.
+        {% else %}
+            for the week of {{ date|date:'F j, Y' }}
+        {% endif %}
+    </p>
+    <div id="budget_chart">
+        <img id="budget_chart_image" src="{{ budgetchart|safe }}" height="34">
+    </div>
+    <hr/>
 
-				<div id="flip_bar">
-					<table id="flip_table" cellpadding="0">
-						<tbody>
-							<tr>
-								<td class="thin-table-cell">
-									<a href="/electric/bar/{{ date|previousweek:"%Y" }}/week/{{ date|previousweek:"%U" }}">
-										<div class="previous_button"></div>
-									</a>
-								</td>
-								<td style="width: 50%;">
-									<a href="/electric/bar/{{ date|previousweek:"%Y" }}/week/{{ date|previousweek:"%U" }}">
-										<div class="previous_label">Previous week</div>
-									</a>
-								</td>
-								<td style="width: 50%;">
-									{% if not date|iscurrentweek %}
-										<a href="/electric/bar/{{ date|nextweek:"%Y" }}/week/{{ date|nextweek:"%U" }}">
-											<div class="next_label">Next week</div>
-										</a>
-									{% endif %}
-								</td>
-								<td style="" class="thin-table-cell">
-									{% if not date|iscurrentweek %}
-										<a href="/electric/bar/{{ date|nextweek:"%Y" }}/week/{{ date|nextweek:"%U" }}">
-											<div class="next_button"></div>
-										</a>
-									{% endif %}
-								</td>
-								<td style="" class="thin-table-cell" id="flip_right_col">
-									{% if not date|iscurrentweek %}
-										<a href="/electric/bar/week/">
-											<div class="latest_button"></div>
-										</a>
-									{% endif %}
-								</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
-			
+    <h2>Scatter</h2>
+    <div id="scatter_chart">
+        <img id="scatter_chart_image" src="{{ scatterchart }}">
+    </div>
 {% endblock %}
 

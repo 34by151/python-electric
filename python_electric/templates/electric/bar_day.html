@@ -2,233 +2,197 @@
 {% load custom %}
 
 {% block left_content %}
-	{% if statistics %}
-		<div id="content_left" class="span-6 last">
-			<div id="stats" style="">
-				<div id="stats_message_container">
-					<ul>
-                        <li><strong>{{ statistics.kwtotal|floatformat:2 }}</strong> kW·h  used</li>
-                        <li>
-                            $<strong>{{ statistics.kwtotalcost|floatformat:2 }}</strong> or approx.
-                            $<strong>{{ statistics.kwyearcost|floatformat:2 }}</strong>/year
-                        </li>
-                        <li>
-                            <span {% if statistics.kwbudget > 0 %}class="negData"{% else %}class="posData" {% endif %}>
-                                <strong>{{ statistics.kwbudget|absolute|floatformat:2 }}</strong> kW·h
-                                {% if statistics.kwbudget > 0 %}over{% else %}under{% endif %} budget
-                                ({% if statistics.kwbudget > 0 %}+{% else %}-{% endif %}$<strong>{{ statistics.kwbudgetcost|absolute|floatformat:2 }}</strong>)
-                            </span>
-                        </li>
-                        <li>
-                            {% if statistics.budgetdate %}
-                                Budget set
-                                {% if statistics.budgetdate|istoday %}
-                                    <strong>today</strong>
-                                {% else %}
-                                    on <strong>{{ statistics.budgetdate|date:'n/j/Y' }}</strong>
-                                {% endif %}
+    <div class="row">
+        <div class="well">
+            <div class="btn-group">
+                <a href="/electric/bar/{{ date|previousday:"%Y/%m/%d/" }}">
+                    <button class="btn btn-small"><i class="icon-step-backward">></i></button>
+                </a>
+                {#        </div>#}
+                {#        <div class="span2 pull-right">#}
+                <button class="btn btn-small btn-info disabled">{{ date|date:'M j, Y' }}</button>
+                {% if not date|istoday %}<a href="/electric/bar/{{ date|nextday:"%Y/%m/%d/" }}">{% endif %}
+                    <button class="btn btn-small pull-right {% if date|istoday %}disabled{% endif %}"><i class="icon-step-forward">></i></button>
+                {% if not date|istoday %}</a>{% endif %}
+                {% if not date|istoday %}<a href="/electric/bar/day/">{% endif %}
+                    <button class="btn btn-small pull-right {% if date|istoday %}disabled{% endif %}"><i class="icon-fast-forward">></i></button>
+                {% if not date|istoday %}</a>{% endif %}
+            </div>
+        </div>
+    </div>
+    {% if statistics %}
+        <div class="row">
+            <div class="well">
+                <h4>Statistics</h4>
+                <br>
+                <table class="table table-condensed stat">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th>used</th>
+                        <th>budget</th>
+                        <th>last</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <th>kW·h</th>
+                        <td>{{ statistics.kwtotal|floatformat:1 }}</td>
+                        <td>{{ statistics.kwbudget|floatformat:1 }}<br>
+                            {{ statistics.budgetpercent|percent }}%
+                            {% if statistics.budgetpercent > 0 %}
+                                <i class="icon-arrow-up"></i>
+                            {% elif statistics.budgetpercent < 0 %}
+                                <i class="icon-arrow-down"></i>
                             {% endif %}
-                        </li>
-					</ul>
-                    <ul>
-                        <li>7 day: <strong>{{ statistics.average7|floatformat:2 }}</strong> kW·h/Day
-                            (<span {% if statistics.average7_delta > 0 %}class="negData"{% else %}class="posData" {% endif %}>
-                                {% if statistics.average7_delta < 0 %}-{% else %}+{% endif %}
+                        </td>
+                        <td>{{ statistics.lastday|floatformat:1 }}<br>
+                            {{ statistics.lastdaypercent|percent }}%
+                            {% if statistics.lastdaypercent > 0 %}
+                                <i class="icon-arrow-up"></i>
+                            {% elif statistics.lastdaypercent < 0  %}
+                                <i class="icon-arrow-down"></i>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>$</th>
+                        <td>{{ statistics.kwtotalcost|floatformat:2 }}</td>
+                        <td>{{ statistics.kwbudgetcost|floatformat:2 }}</td>
+                        <td>{{ statistics.lastdaycost|floatformat:2 }}</td>
+                    </tr>
+                    <tr>
+                        <th>$/year</th>
+                        <td>{{ statistics.kwyearcost|floatformat:0 }}</td>
+                        <td>{{ statistics.kwbudgetcostyear|floatformat:0 }}</td>
+                        <td>{{ statistics.lastdaycostyear|absolute|floatformat:0 }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <table class="table table-condensed stat">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>avg</th>
+                            <th>change</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>7 day</th>
+                            <td>{{ statistics.average7|floatformat:1 }} kW·h</td>
+                            <td>
                                 {{ statistics.average7_delta|percent}}%
-                            </span>)
-                        </li>
-                        <li>14 day: <strong>{{ statistics.average14|floatformat:2 }}</strong> kW·h/Day
-                            (<span {% if statistics.average14_delta > 0 %}class="negData"{% else %}class="posData" {% endif %}>
-                                {% if statistics.average14_delta < 0 %}-{% else %}+{% endif %}
+                                {% if statistics.average7_delta > 0 %}
+                                    <i class="icon-arrow-up"></i>
+                                {% elif statistics.average7_delta < 0 %}
+                                    <i class="icon-arrow-down"></i>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>14 day</th>
+                            <td>{{ statistics.average14|floatformat:1 }} kW·h</td>
+                            <td>
                                 {{ statistics.average14_delta|percent}}%
-                            </span>)
-                        </li>
-                        <li>28 day: <strong>{{ statistics.average28|floatformat:2 }}</strong> kW·h/Day
-                            (<span {% if statistics.average28_delta > 0 %}class="negData"{% else %}class="posData" {% endif %}>
-                                {% if statistics.average28_delta < 0 %}-{% else %}+{% endif %}
+                                {% if statistics.average14_delta > 0 %}
+                                    <i class="icon-arrow-up"></i>
+                                {% elif statistics.average14_delta < 0 %}
+                                    <i class="icon-arrow-down"></i>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>28 day</th>
+                            <td>{{ statistics.average28|floatformat:1 }} kW·h</td>
+                            <td>
                                 {{ statistics.average28_delta|percent}}%
-                            </span>)
-                        </li>
-                    </ul>
-                    <ul>
-						<li>Est. Cost: $<strong>{{ statistics.kwcost|floatformat:4 }}</strong>/kW·h</li>
-						{% if statistics.lastbill %}
-                            <li>based on bill ending on <strong>{{ statistics.lastbill|date:'n/j/Y' }}</strong></li>
+                                {% if statistics.average28_delta > 0 %}
+                                    <i class="icon-arrow-up"></i>
+                                {% elif statistics.average28_delta < 0 %}
+                                    <i class="icon-arrow-down"></i>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <ul class="unstyled">
+                    <li>Est. Cost: $<strong>{{ statistics.kwcost|floatformat:4 }}</strong>/kW·h
+                        {% if statistics.lastbill %}
+                            based on bill ending on <strong>{{ statistics.lastbill|date:'DATE_FORMAT' }}</strong>
                         {% endif %}
-                    </ul>
-                    <ul>
-						<li>Last update: 
-							<strong>
-								{% if statistics.lastupdate|istoday %}
-	            				Today at {{ statistics.lastupdate|date:'P' }}
-	         				{% else %}
-	            				{{ statistics.lastupdate|date:'n/j @ P' }}
-	            			{% endif %}
-	            	    	</strong>
-	            	    </li>
-					</ul>
-				</div>
-			</div>
-        {% comment %}
-            <table id="stats" style="">
-                <tr>
-                    <td>Usage</td>
-                    <td>
-                        <span><strong>{{ statistics.kwtotal|floatformat:2 }}</strong> kWh</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>
-                        <span>{% if statistics.kwbudget > 0 %}+{% endif %}{{ statistics.kwbudget|floatformat:2 }}</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Cost</td>
-                    <td>
-                        <span>$<strong>{{ statistics.kwtotalcost|floatformat:2 }}</strong></span>
-                    </td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>
-                        <span>{% if statistics.kwbudget > 0 %}+{% endif %}{{ statistics.kwbudgetcost|floatformat:2 }}</span>
-                    </td>
-                </tr>
-            </table>
-        {% endcomment %}
-		</div>
-	{% endif %}
+                    </li>
+                </ul>
+                <ul class="unstyled">
+                    <li>Last update:
+                        <strong>
+                            {% if statistics.lastupdate|istoday %}
+                                Today at {{ statistics.lastupdate|date:'P' }}
+                            {% else %}
+                                {{ statistics.lastupdate|date:'n/j @ P' }}
+                            {% endif %}
+                        </strong>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}
 
 
 
-{% block content %}
-	<h1>{{ date|date:'F j Y' }}</h1>
-	<h2>Usage Summary</h2>
-	<div id='chart'>
-		<img id="hour_chart_image" src="{{ hourchart }}" height="150">
-	</div>
-	<div id="flip_bar">
-		<table id="flip_table" cellpadding="0">
-			<tbody>
-				<tr>
-					<td class="thin-table-cell">
-						<a href="/electric/bar/{{ date|previousday:"%Y/%m/%d/" }}" class="class">
-							<div class="previous_button"></div>
-						</a>
-					</td>
-					<td style="width: 50%;">
-						<a href="/electric/bar/{{ date|previousday:"%Y/%m/%d/" }}" class="class">
-							<div class="previous_label">Previous day</div>
-						</a>
-					</td>
-					<td style="width: 50%;">
-						{% if not date|istoday %}
-							<a href="/electric/bar/{{ date|nextday:"%Y/%m/%d/" }}" class="class">
-								<div class="next_label">Next day</div>
-							</a>
-						{% endif %}
-					</td>
-					<td style="" class="thin-table-cell">
-						{% if not date|istoday %}
-							<a href="/electric/bar/{{ date|nextday:"%Y/%m/%d/" }}" class="class">
-								<div class="next_button"></div>
-							</a>
-						{% endif %}
-					</td>
-					<td style="" class="thin-table-cell" id="flip_right_col">
-						{% if not date|istoday %}
-							<a href="/electric/bar/day/">
-								<div class="latest_button"></div>
-							</a>
-						{% endif %}
-					</td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
-	
-	<div id="mini_display_budget" style="">
-		<div class="header" id="budget_header_title">Compared to past usage</div>
-		<div id="budget_message_container">
-			<span id="budget_message">
-				{% spaceless %}
-                    {% if statistics.budgetpercent > 0.01 %}
-                        <strong>{{ statistics.budgetpercent|percent }}% over</strong>
+{% block content_electric %}
+    <h1>Electricity Use <small>{{ date|date:'DATE_FORMAT' }}</small></h1>
+    <h2>Hourly Summary</h2>
+    <div id='chart'>
+        <img id="hour_chart_image" src="{{ hourchart }}" height="150">
+    </div>
+    <hr/>
+    <h2>Budget
+        <small>
+            {% if statistics.budgetdate %}set
+                {% if statistics.budgetdate|istoday %}
+                    today
+                {% else %}
+                    on {{ statistics.budgetdate|date:'DATE_FORMAT' }}
+                {% endif %}
+            {% else %}
+                default budget
+            {% endif %}
+        </small>
+    </h2>
+    <div id="mini_display_budget" style="">
+        <div id="budget_message_container">
+            <p>
+                {% if statistics.budgetpercent > 0.01 %}
+                    <strong>{{ statistics.budgetpercent|percent }}% over</strong>
+                {% else %}
+                    {% if statistics.budgetpercent < -0.01 %}
+                        <strong>{{ statistics.budgetpercent|percent }}% under</strong>
                     {% else %}
-                        {% if statistics.budgetpercent < -0.01 %}
-                            <strong>{{ statistics.budgetpercent|percent }}% under</strong>
-                        {% else %}
-                            <strong>about even</strong> with
-                        {% endif %}
+                        <strong>about even</strong> with
                     {% endif %}
-	                budget
-                     {% if date|istoday %}
-                        so far today.
-                     {% else %}
-                        for {{ date|date:'l' }}
-                     {% endif %}
-	            {% endspaceless %}
-			</span>
-			<span class="help_icon" id="budget_help"></span>
-		</div>
-		<div id="budget_chart">
-			<img id="budget_chart_image" src="{{ budgetchart|safe }}" height="34">
-		</div>
-	</div>
-	
-	<div id="avarage_chart">
-		<div class="header" id="average_header_title">Running average</div>
-		<img id="average_chart_image" src="{{ averagechart }}" height="300">
-	</div>
-	
-	<div id="detail_chart">
-		<div class="header" id="detail_header_title">Detailed usage</div>
-		<a href="{{ settings.MEDIA_URL }}charts/{{ date|date:'Ymd' }}.png">img</a>
-		<a href="/electric/timeline/{{ date|date:'Y/m/d' }}">flash</a>
-		<div><a href="{{ settings.MEDIA_URL }}charts/{{ date|date:'Ymd' }}.png"><img src="{{ settings.STATIC_URL }}charts/{{ date|date:'Ymd' }}-small.png" border="0" /></a></div>
-	</div>
-	
-	<div id="flip_bar">
-		<table id="flip_table" cellpadding="0">
-			<tbody>
-				<tr>
-					<td class="thin-table-cell">
-						<a href="/electric/bar/{{ date|previousday:"%Y/%m/%d/" }}" class="class">
-							<div class="previous_button"></div>
-						</a>
-					</td>
-					<td style="width: 50%;">
-						<a href="/electric/bar/{{ date|previousday:"%Y/%m/%d/" }}" class="class">
-							<div class="previous_label">Previous day</div>
-						</a>
-					</td>
-					<td style="width: 50%;">
-						{% if not date|istoday %}
-							<a href="/electric/bar/{{ date|nextday:"%Y/%m/%d/" }}" class="class">
-								<div class="next_label">Next day</div>
-							</a>
-						{% endif %}
-					</td>
-					<td style="" class="thin-table-cell">
-						{% if not date|istoday %}
-							<a href="/electric/bar/{{ date|nextday:"%Y/%m/%d/" }}" class="class">
-								<div class="next_button"></div>
-							</a>
-						{% endif %}
-					</td>
-					<td style="" class="thin-table-cell" id="flip_right_col">
-						{% if not date|istoday %}
-							<a href="/electric/bar/day/">
-								<div class="latest_button"></div>
-							</a>
-						{% endif %}
-					</td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
-				
+                {% endif %}
+                budget
+                {% if date|istoday %}
+                    so far today.
+                {% else %}
+                    for {{ date|date:'l' }}.
+                {% endif %}
+            </p>
+        </div>
+        <div id="budget_chart">
+            <img id="budget_chart_image" src="{{ budgetchart|safe }}" height="34">
+        </div>
+    </div>
+    <hr/>
+    <h2>Running Average</h2>
+    <img id="average_chart_image" src="{{ averagechart }}" height="300">
+    <hr/>
+    <h2>Detailed Usage</h2>
+    <a href="{{ settings.MEDIA_URL }}charts/{{ date|date:'Ymd' }}.png">img</a>
+    <a href="/electric/timeline/{{ date|date:'Y/m/d' }}">flash</a>
+    <div><a href="{{ settings.MEDIA_URL }}charts/{{ date|date:'Ymd' }}.png"><img src="{{ settings.STATIC_URL }}charts/{{ date|date:'Ymd' }}-small.png" border="0" /></a></div>
+
 {% endblock %}
 
